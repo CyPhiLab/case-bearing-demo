@@ -120,9 +120,15 @@
     (logY ? d3.scaleLog() : d3.scaleLinear()).domain(yd).range([innerH, 0]) as d3.ScaleContinuousNumeric<number, number>,
   );
   const xTicks = $derived(x.ticks(Math.max(2, Math.floor(innerW / 90))));
-  const yTicks = $derived(logY ? y.ticks(4).filter((_, i, a) => a.length < 8 || i % 2 === 0) : y.ticks(Math.max(2, Math.floor(innerH / 45))));
+  // log axes: label only 1-2-5 steps (or just powers of ten when that is still too many)
+  const yTicks = $derived.by(() => {
+    if (!logY) return y.ticks(Math.max(2, Math.floor(innerH / 45)));
+    const mant = (t: number) => Math.round(t / 10 ** Math.floor(Math.log10(t) + 1e-9));
+    const t125 = y.ticks().filter((t) => [1, 2, 5].includes(mant(t)));
+    return t125.length <= Math.max(3, innerH / 28) ? t125 : t125.filter((t) => mant(t) === 1);
+  });
   const fx = $derived(xFormat ?? x.tickFormat());
-  const fy = $derived(yFormat ?? (logY ? d3.format('.0e') : y.tickFormat()));
+  const fy = $derived(yFormat ?? (logY ? d3.format('~g') : y.tickFormat()));
 
   function resolve(color: string): string {
     const m = color.match(/^var\((--[\w-]+)\)$/);

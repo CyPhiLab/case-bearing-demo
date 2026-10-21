@@ -78,3 +78,17 @@ test('the convolution animation reproduces the network output', async ({ page })
   await page.waitForTimeout(1500);
   await expect(card.locator('.num', { hasText: 'position' })).not.toHaveText('position 1 / 2017');
 });
+
+test('run-to-failure data: life slider, early warning and cross-machine test', async ({ page }) => {
+  const errors = await open(page);
+  const life = page.locator('#signal .card', { hasText: 'failed on its own' });
+  await expect(life.getByText('Waveform')).toBeVisible({ timeout: 30_000 });
+  await life.locator('input[type=range]').fill('12');
+  await expect(life.getByText(/day 6\.\d/).first()).toBeVisible();
+  const ew = page.locator('#diagnose .card', { hasText: 'early-warning alarm' });
+  await expect(ew.locator('tr.failed td').nth(2)).toHaveText(/day 3\.\d/, { timeout: 30_000 });
+  await expect(page.locator('#diagnose .card', { hasText: 'a different machine' }).getByText(/"Outer Race" for \d+%/)).toBeVisible();
+  await page.locator('#rig button', { hasText: 'NASA/IMS' }).click();
+  await expect(page.locator('#rig').getByText('wore out on its own')).toBeVisible();
+  expect(errors).toEqual([]);
+});

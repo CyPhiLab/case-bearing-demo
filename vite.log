@@ -8,3 +8,22 @@
 1:17:24 AM [vite] (client) hmr update /src/sections/MLP.svelte
 1:19:21 AM [vite] (client) hmr update /src/lib/viz/TrainPanel.svelte
 1:19:21 AM [vite] (client) hmr update /src/lib/charts/NetDiagram.svelte
+1:21:25 AM [vite] (client) hmr update /src/sections/Rig.svelte, /src/sections/Signal.svelte, /src/sections/Windows.svelte, /src/sections/Diagnose.svelte, /src/lib/viz/BearingAnim.svelte
+1:21:25 AM [vite-plugin-svelte] src/lib/viz/BearingAnim.svelte:24:21 This reference only captures the initial value of `rPitch`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+1:21:25 AM [vite-plugin-svelte] src/lib/viz/BearingAnim.svelte:24:30 This reference only captures the initial value of `rBall`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+1:21:25 AM [vite-plugin-svelte] src/lib/viz/BearingAnim.svelte:25:21 This reference only captures the initial value of `rPitch`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+1:21:25 AM [vite-plugin-svelte] src/lib/viz/BearingAnim.svelte:25:30 This reference only captures the initial value of `rBall`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+1:21:25 AM [vite] (client) hmr update /src/lib/viz/BearingAnim.svelte
+1:21:31 AM [vite] (client) hmr update /src/lib/viz/BearingAnim.svelte
+1:21:40 AM [vite] (client) hmr update /src/sections/Rig.svelte
+1:21:47 AM [vite] (client) hmr update /src/sections/Rig.svelte, /src/sections/Rig.svelte?svelte&type=style&lang.css
+1:23:28 AM [vite] (client) hmr update /src/sections/Features.svelte
+1:23:28 AM [vite] (client) hmr update /src/sections/Signal.svelte
+1:24:04 AM [vite] (client) hmr update /src/lib/charts/LineChart.svelte
+1:25:11 AM [vite] (client) hmr update /src/sections/Diagnose.svelte
+1:25:27 AM [vite] (client) hmr update /src/lib/viz/EarlyWarning.svelte
+1:25:51 AM [vite] (client) hmr update /src/lib/viz/EarlyWarning.svelte

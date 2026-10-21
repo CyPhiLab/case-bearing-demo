@@ -5,7 +5,7 @@
 <script lang="ts">
   // Kinematic animation of a 6205 bearing with a seeded defect, plus the vibration it would produce.
   import { onMount, untrack } from 'svelte';
-  import { BEARING, faultFrequencies } from '../bearing';
+  import { BEARING, faultFrequencies, type BearingGeometry } from '../bearing';
   import { app } from '../state.svelte';
 
   interface Props {
@@ -13,20 +13,21 @@
     defect: DefectSite;
     slowmo: number; // animation runs 1/slowmo of real time
     playing: boolean;
+    geometry?: BearingGeometry;
   }
-  let { rpm, defect, slowmo, playing }: Props = $props();
+  let { rpm, defect, slowmo, playing, geometry = BEARING }: Props = $props();
 
   // geometry scaled so the outer diameter is 200 SVG units
-  const S = 100 / (BEARING.outerDiameter / 2);
-  const rPitch = (BEARING.pitchDiameter / 2) * S;
-  const rBall = (BEARING.ballDiameter / 2) * S;
-  const rOuterRace = rPitch + rBall;
-  const rInnerRace = rPitch - rBall;
-  const rBore = (BEARING.innerDiameter / 2) * S;
-  const N = BEARING.balls;
+  const S = $derived(100 / (geometry.outerDiameter / 2));
+  const rPitch = $derived((geometry.pitchDiameter / 2) * S);
+  const rBall = $derived((geometry.ballDiameter / 2) * S);
+  const rOuterRace = $derived(rPitch + rBall);
+  const rInnerRace = $derived(rPitch - rBall);
+  const rBore = $derived((geometry.innerDiameter / 2) * S);
+  const N = $derived(geometry.balls);
   const LOAD = Math.PI / 2; // load zone at 6 o'clock (SVG y points down)
 
-  const ff = $derived(faultFrequencies(rpm));
+  const ff = $derived(faultFrequencies(rpm, geometry));
   let t = $state(0); // simulated (real-world) seconds
   let flash = $state(0); // 1 right after an impact, decays
   let canvas: HTMLCanvasElement;
@@ -157,6 +158,7 @@
     // refill the visible trace whenever the defect or speed changes, so it never starts blank
     void defect;
     void rpm;
+    void geometry;
     untrack(() => {
       impacts.length = 0;
       const now = Math.max(t, WINDOW + 0.01);

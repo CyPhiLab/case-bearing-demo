@@ -11,15 +11,15 @@ trained offline and **runs live** with TensorFlow.js. The site is plain static f
 
 | # | Section | Students can… | Builds on lecture |
 |---|---------|---------------|-------------------|
-| 1 | The bearing | Watch an animated 6205 bearing strike a seeded defect, change rpm, and see BPFO/BPFI/BSF computed from geometry | – |
-| 2 | Look & listen | Browse all 10 recordings, **listen to them** (with ¼-speed playback), zoom the waveform with expected impact spacing overlaid, view the spectrum and envelope spectrum with fault-frequency markers | Data: plot your data |
+| 1 | The bearing | Watch an animated bearing strike a defect (CWRU SKF 6205 or IMS Rexnord ZA-2115), change rpm, and see BPFO/BPFI/BSF computed from geometry | – |
+| 2 | Look & listen | Browse all 10 recordings, **listen to them** (with ¼-speed playback), zoom the waveform with expected impact spacing overlaid, view the spectrum and envelope spectrum with fault-frequency markers. Then step through a week-long **run-to-failure** test and watch the BPFO line appear | Data: plot your data |
 | 3 | Windows | Slice a recording into windows, change window size and overlap, and see the count / resolution trade-offs | Data: how much data |
-| 4 | Features | See all 18 features computed live for any window, with strip plots per class and a two-feature scatter | Data: normalization |
+| 4 | Features | See all 18 features computed live for any window, with strip plots per class and a two-feature scatter, plus health indicators trended over the IMS bearings' life | Data: normalization |
 | 5 | PCA | Project the 18-D feature space to 2-D, hide labels, read the scree plot and loadings | NN: embedding / PCA |
 | 6 | Logistic regression | Train it live in the PCA plane (≈74%, straight boundaries) and on all 18 features (≈100%), and inspect the coefficient heatmap | Regression: logistic regression |
-| 7 | Neural network | Same PCA plane with an MLP (≈99%, curved boundaries), plus a full playground (layers, neurons, activation, learning rate, dropout, L2, training-set size, a "make it overfit" preset) with a live network diagram and loss curves | NN: hidden layers, ReLU, backprop, dropout |
-| 8 | CNN | Feed raw test windows (optionally noisy) through the pretrained CNN, and see learned filters, their frequency responses and feature maps, plus a noise-robustness sweep | NN: types of networks |
-| 9 | Diagnose | A "be the diagnostician" game against the three models, a stress test on an **unseen defect size** (accuracy collapses, showing out-of-distribution behavior), a summary and takeaways | Intro: out of distribution |
+| 7 | Neural network | Same PCA plane with an MLP (≈99%, curved boundaries), plus a full playground (layers, neurons, activation, learning rate, dropout, L2, training-set size, **mislabeled labels**) with a live network diagram and loss curves. "Make it overfit" memorizes bad labels (~99% train / ~75% test), and the "Fix: add L2" / "Fix: more data" buttons recover it | Data: bad labels, overfitting, regularization; NN: backprop, dropout |
+| 8 | CNN | Feed raw test windows (optionally noisy) through the pretrained CNN, **step through a convolution** with the network's real filter, and see learned filters, their frequency responses and feature maps, plus a noise-robustness sweep | NN: types of networks |
+| 9 | Diagnose | A "be the diagnostician" game against the three models, a stress test on an **unseen defect size** (accuracy collapses, showing out-of-distribution behavior), an **early-warning alarm** on the IMS run-to-failure data (anomaly detection, no labels), a **cross-machine test** (the CWRU models on the IMS bearing, showing domain shift), a summary and takeaways | Intro: out of distribution |
 
 **Two modes** (toggle at the top right, or link with `?mode=lecture`):
 
@@ -49,6 +49,15 @@ Reference accuracies (`public/data/reference.json`, scikit-learn on the same spl
 features. In the PCA plane: logistic regression ≈74%, MLP ≈99%. The CNN reaches 100% on the test windows. Holding out a whole
 defect size drops an MLP to 25–70%. The site uses that as its out-of-distribution lesson.
 
+### NASA/IMS run-to-failure data
+
+Test 2 of the IMS bearing experiments (University of Cincinnati / Rexnord, distributed by the NASA Prognostics Data Repository, US
+government work). Four Rexnord ZA-2115 roller bearings ran at 2000 rpm under a 6000 lb radial load for about 7 days, recorded for
+1 s every 10 minutes at 20.48 kHz, until bearing 1's outer race failed. `pipeline/prepare_ims.py` writes the health indicators of all
+four bearings (RMS, kurtosis, crest factor, envelope amplitude at BPFO = 236 Hz) for every snapshot, the 18 features of bearing 1
+(resampled to 12 kHz, as the CWRU models expect), and 16 raw snapshots for listening. That's about 0.9 MB in `public/data/ims/`, loaded
+lazily.
+
 ## Run it locally
 
 ```bash
@@ -71,6 +80,10 @@ pip install -r pipeline/requirements.txt
 git clone --depth=1 https://github.com/srigas/CWRU_Bearing_NumPy.git data-cache/CWRU_Bearing_NumPy
 python pipeline/prepare_data.py   # signals, metadata, sklearn reference, parity fixtures
 python pipeline/train_cnn.py      # ~3 min on a laptop CPU; writes public/data/cnn/
+
+# NASA/IMS run-to-failure (needs 7z + unrar/unar to unpack): 4. Bearings.zip -> IMS.7z -> 2nd_test.rar
+curl -L -o data-cache/ims.zip "https://phm-datasets.s3.amazonaws.com/NASA/4.+Bearings.zip"
+python pipeline/prepare_ims.py --raw data-cache/ims/2nd_test
 npm test                          # confirms the browser code still matches
 ```
 
@@ -94,6 +107,8 @@ tests/               vitest unit tests + Playwright smoke tests
 
 ## Credits
 
-Data: [Case Western Reserve University Bearing Data Center](https://engineering.case.edu/bearingdatacenter). Feature set adapted
+Data: [Case Western Reserve University Bearing Data Center](https://engineering.case.edu/bearingdatacenter), and the IMS bearing
+data set (J. Lee, H. Qiu, G. Yu, J. Lin and Rexnord Technical Services, IMS, University of Cincinnati, 2007; NASA Prognostics Data
+Repository). Feature set adapted
 from [L. G. Di Maggio](https://github.com/LGDiMaggio/CWRU-bearing-fault-classification-ML). See also W. A. Smith & R. B. Randall
 (2015), *Rolling element bearing diagnostics using the Case Western Reserve University data: A benchmark study*, MSSP 64–65.

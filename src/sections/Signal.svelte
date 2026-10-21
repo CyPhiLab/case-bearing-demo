@@ -10,6 +10,7 @@
   import { RIG_RPM, faultFrequencies } from '../lib/bearing';
   import { classVar } from '../lib/classes';
   import * as audio from '../lib/audio';
+  import IMSLife from '../lib/viz/IMSLife.svelte';
 
   let { ds }: { ds: Dataset } = $props();
 
@@ -260,6 +261,17 @@
       spectra don't show the "right" line cleanly. Researchers who benchmarked this dataset (Smith &amp; Randall, 2015) found the same
       thing. That's a big reason to let a model learn from many features at once instead of relying on a single rule.
     </p>
+  </div>
+
+  <div class="card" style="margin-top: 1rem">
+    <h3>Meanwhile, on another rig: a bearing that failed on its own</h3>
+    <p class="small secondary">
+      Machined pits are "born" fully formed. Real bearings wear out gradually. This is bearing 1 of the NASA/IMS run-to-failure test
+      (the second rig in section 1). It was recorded for one second every 10 minutes for a week, until its outer race failed. Drag through
+      its life and listen. Watch for the day the <b>BPFO line at 236 Hz</b> appears in the envelope spectrum, long before the waveform
+      looks dramatic.
+    </p>
+    <IMSLife />
   </div>
 </Section>
 

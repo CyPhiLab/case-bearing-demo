@@ -85,3 +85,18 @@ describe('bearing kinematics', () => {
     expect(2 * f.bsf).toBeCloseTo(4.7135, 3);
   });
 });
+
+describe('IMS run-to-failure assets', () => {
+  const trend = JSON.parse(readFileSync('public/data/ims/trend.json', 'utf8'));
+  it('uses the Rexnord ZA-2115 outer-race frequency', async () => {
+    const { faultFrequencies, IMS_BEARING } = await import('../src/lib/bearing');
+    expect(faultFrequencies(2000, IMS_BEARING).bpfo).toBeCloseTo(trend.bpfo, 6);
+  });
+  it('alarms on the failing bearing days before the end', async () => {
+    const { firstAlarm } = await import('../src/lib/ims');
+    const a = firstAlarm(trend.indicators.envBPFO[0], trend.hours, 24, 5);
+    const end = trend.hours.at(-1);
+    expect(a.index).toBeGreaterThan(0);
+    expect((end - trend.hours[a.index]) / 24).toBeGreaterThan(2);
+  });
+});

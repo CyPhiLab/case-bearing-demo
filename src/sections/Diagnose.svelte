@@ -17,6 +17,8 @@
   import { RIG_RPM, faultFrequencies } from '../lib/bearing';
   import { CLASS_NAMES, CLASS_SHORT, classVar } from '../lib/classes';
   import { app, results } from '../lib/state.svelte';
+  import EarlyWarning from '../lib/viz/EarlyWarning.svelte';
+  import CrossMachine from '../lib/viz/CrossMachine.svelte';
 
   let { ds }: { ds: Dataset } = $props();
   const rows = $derived(featureTable(ds));
@@ -237,6 +239,25 @@
     </div>
   </div>
 
+  <div class="card" style="margin-top: 1rem">
+    <h3>Real failures don't come labelled: an early-warning alarm</h3>
+    <p class="small secondary">
+      On the NASA/IMS rig nobody knew which bearing would fail, so there are no fault labels to train a classifier on. What you <i>can</i>
+      do is learn what "normal" looks like and alarm when a bearing leaves it. That's <b>anomaly detection</b>. Pick a health indicator
+      from section 4, set the alarm threshold, and see how much warning you would have had before bearing 1 failed.
+    </p>
+    <EarlyWarning />
+  </div>
+
+  <div class="card" style="margin-top: 1rem">
+    <h3>Stress test #2: a different machine</h3>
+    <p class="small secondary">
+      Would our CWRU-trained classifiers catch the IMS bearing's failure? Each tick below is one 10-minute snapshot of bearing 1,
+      resampled to 12 kHz and turned into the same 18 features, colored by the predicted class.
+    </p>
+    <CrossMachine {models} />
+  </div>
+
   <div class="grid-2" style="margin-top: 1rem">
     <div class="card">
       <h3>Your results on this page</h3>
@@ -260,6 +281,7 @@
         <li><b>Physics-informed features are powerful.</b> 18 numbers and a linear model already separate these classes.</li>
         <li><b>Neural networks bend boundaries</b> when straight lines aren't enough, at the cost of parameters and interpretability.</li>
         <li><b>CNNs learn features</b> directly from raw signals, and their first layer rediscovered frequency-selective filtering.</li>
+        <li><b>Real failures grow slowly.</b> Trending a physics-informed indicator (envelope at BPFO) gave days of warning on the IMS bearing, with no labels needed.</li>
         <li><b>Lab accuracy ≠ field accuracy.</b> New fault sizes, loads and machines are out of distribution. Garbage (or narrow data) in, garbage out.</li>
       </ul>
     </div>
@@ -269,6 +291,7 @@
     <h3>Go further</h3>
     <ul>
       <li>Case Western Reserve University Bearing Data Center: <a href="https://engineering.case.edu/bearingdatacenter">engineering.case.edu/bearingdatacenter</a></li>
+      <li>NASA/IMS run-to-failure data: J. Lee, H. Qiu, G. Yu, J. Lin, and Rexnord Technical Services (2007), "Bearing Data Set," IMS, University of Cincinnati, NASA Prognostics Data Repository. See also H. Qiu et al. (2006), <i>Journal of Sound and Vibration</i> 289, 1066–1090.</li>
       <li>W. A. Smith &amp; R. B. Randall (2015), "Rolling element bearing diagnostics using the Case Western Reserve University data: A benchmark study," <i>Mechanical Systems and Signal Processing</i> 64–65.</li>
       <li>The Python behind this page (data prep, features, CNN training): the <code>pipeline/</code> folder of this site's GitHub repository.</li>
       <li>3Blue1Brown, <a href="https://www.3blue1brown.com/topics/neural-networks">Neural networks</a> · Google, <a href="https://developers.google.com/machine-learning/crash-course">ML Crash Course</a></li>

@@ -1,12 +1,43 @@
+export interface BearingGeometry {
+  model: string;
+  rig: string;
+  balls: number; // rolling elements per row
+  ballDiameter: number; // in
+  pitchDiameter: number; // in
+  innerDiameter: number; // in (bore, for drawing)
+  outerDiameter: number; // in (for drawing)
+  contactAngle: number; // rad
+  rpm: number; // shaft speed used on that rig
+  element: 'ball' | 'roller';
+}
+
 // Drive-end bearing on the CWRU rig: SKF 6205-2RS JEM deep-groove ball bearing.
-export const BEARING = {
+export const BEARING: BearingGeometry = {
   model: 'SKF 6205-2RS JEM',
+  rig: 'CWRU motor test stand (seeded faults)',
   balls: 9,
   ballDiameter: 0.3126, // in
   pitchDiameter: 1.537, // in
   innerDiameter: 0.9843,
   outerDiameter: 2.0472,
   contactAngle: 0, // rad
+  rpm: 1772,
+  element: 'ball',
+};
+
+// IMS / NASA run-to-failure rig: Rexnord ZA-2115 double-row spherical roller bearing (Qiu et al., 2006).
+// Bore and outer diameter are drawing approximations; the kinematics only need d, D, n and the contact angle.
+export const IMS_BEARING: BearingGeometry = {
+  model: 'Rexnord ZA-2115',
+  rig: 'IMS run-to-failure rig (natural wear)',
+  balls: 16,
+  ballDiameter: 0.331,
+  pitchDiameter: 2.815,
+  innerDiameter: 2.815 - 2.6 * 0.331,
+  outerDiameter: 2.815 + 2.6 * 0.331,
+  contactAngle: (15.17 * Math.PI) / 180,
+  rpm: 2000,
+  element: 'roller',
 };
 
 export const RIG_RPM = 1772; // 1 hp load
@@ -20,7 +51,7 @@ export interface FaultFrequencies {
 }
 
 /** Classic kinematic defect frequencies for a rotating inner race and stationary outer race. */
-export function faultFrequencies(rpm: number, b = BEARING): FaultFrequencies {
+export function faultFrequencies(rpm: number, b: BearingGeometry = BEARING): FaultFrequencies {
   const fr = rpm / 60;
   const r = (b.ballDiameter / b.pitchDiameter) * Math.cos(b.contactAngle);
   return {
