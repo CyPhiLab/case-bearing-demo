@@ -15,8 +15,10 @@ async function trainAndWait(page: Page, section: string, index: number) {
   await expect(button).toHaveText(/Retrain/, { timeout: 60_000 });
 }
 
-const accuracy = async (page: Page, section: string, index: number) =>
-  parseFloat((await page.locator(`#${section} .panel .stat .value`).nth(index).textContent())!);
+// test accuracy is the first stat of each training panel; training accuracy the second
+const stat = async (page: Page, section: string, panel: number, which = 0) =>
+  parseFloat((await page.locator(`#${section} .panel`).nth(panel).locator('.stat .value').nth(which).textContent())!);
+const accuracy = (page: Page, section: string, panel: number) => stat(page, section, panel, 0);
 
 test('every section renders without errors', async ({ page }) => {
   const errors = await open(page);
@@ -33,7 +35,7 @@ test('logistic regression and MLP train in the browser and reach the expected ac
   expect(lr2d).toBeGreaterThan(60);
   expect(lr2d).toBeLessThan(90);
   await trainAndWait(page, 'logistic', 1); // all 18 features
-  expect(await accuracy(page, 'logistic', 2)).toBeGreaterThan(95);
+  expect(await accuracy(page, 'logistic', 1)).toBeGreaterThan(95);
   await trainAndWait(page, 'mlp', 0); // PCA plane with hidden layers
   expect(await accuracy(page, 'mlp', 0)).toBeGreaterThan(95);
 });
@@ -54,4 +56,25 @@ test('lecture mode hides self-paced material', async ({ page }) => {
   await open(page, '?mode=lecture');
   await expect(page.locator('html')).toHaveAttribute('data-mode', 'lecture');
   await expect(page.locator('.predict').first()).toBeHidden();
+});
+
+test('the overfitting preset overfits, and L2 fixes it', async ({ page }) => {
+  await open(page);
+  const card = page.locator('#mlp .card', { hasText: 'Neural-network playground' });
+  await card.getByRole('button', { name: 'Make it overfit' }).click();
+  await trainAndWait(page, 'mlp', 1);
+  expect(await stat(page, 'mlp', 1, 1)).toBeGreaterThan(95); // memorized the training labels...
+  expect(await accuracy(page, 'mlp', 1)).toBeLessThan(90); // ...but doesn't generalize
+  await card.getByRole('button', { name: 'Fix: add L2' }).click();
+  await trainAndWait(page, 'mlp', 1);
+  expect(await accuracy(page, 'mlp', 1)).toBeGreaterThan(90);
+});
+
+test('the convolution animation reproduces the network output', async ({ page }) => {
+  await open(page);
+  const card = page.locator('#cnn .card', { hasText: 'How a convolution works' });
+  await expect(card).toBeVisible({ timeout: 30_000 });
+  await card.getByRole('button', { name: /Play/ }).click();
+  await page.waitForTimeout(1500);
+  await expect(card.locator('.num', { hasText: 'position' })).not.toHaveText('position 1 / 2017');
 });

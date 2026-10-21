@@ -1,0 +1,10 @@
+
+  VITE v7.3.7  ready in 994 ms
+
+  ➜  Local:   http://localhost:5173/case-bearing-demo/
+  ➜  Network: use --host to expose
+1:15:55 AM [vite] (client) hmr update /src/sections/Logistic.svelte, /src/sections/PCA.svelte, /src/sections/MLP.svelte, /src/sections/Diagnose.svelte, /src/lib/viz/BoundaryLab.svelte
+1:17:24 AM [vite] (client) hmr update /src/lib/viz/TrainPanel.svelte, /src/lib/viz/TrainPanel.svelte?svelte&type=style&lang.css
+1:17:24 AM [vite] (client) hmr update /src/sections/MLP.svelte
+1:19:21 AM [vite] (client) hmr update /src/lib/viz/TrainPanel.svelte
+1:19:21 AM [vite] (client) hmr update /src/lib/charts/NetDiagram.svelte

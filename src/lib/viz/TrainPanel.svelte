@@ -19,6 +19,13 @@
   const ep = $derived(run.epochs);
   const last = $derived(ep.at(-1));
   const pct = d3.format('.1%');
+  // where early stopping would have stopped (only worth showing once validation loss has turned around)
+  const bestEpoch = $derived.by(() => {
+    if (ep.length < 10) return null;
+    let b = 0;
+    ep.forEach((e, i) => e.valLoss < ep[b].valLoss && (b = i));
+    return ep.at(-1)!.valLoss > ep[b].valLoss * 1.25 ? ep[b].epoch : null;
+  });
 </script>
 
 <div class="panel">
@@ -39,6 +46,12 @@
       <span class="value" class:pending={!run.result}>{run.result ? pct(run.result.testAcc) : last ? pct(last.valAcc) : '–'}</span>
       <span class="label">{run.result ? 'test accuracy' : 'validation accuracy (so far)'}</span>
     </div>
+    {#if run.result && last}
+      <div class="stat">
+        <span class="value train">{pct(last.acc)}</span>
+        <span class="label">training accuracy</span>
+      </div>
+    {/if}
     {#if reference !== null}
       <div class="stat">
         <span class="value ref">{pct(reference)}</span>
@@ -63,6 +76,7 @@
     xLabel="epoch"
     yLabel="log loss"
     legend
+    markers={bestEpoch ? [{ x: bestEpoch, dash: true, label: 'lowest val. loss', color: 'var(--text-muted)', row: 1 }] : []}
     ariaLabel="Loss curves"
   />
   {#if !compact || run.result}
@@ -78,7 +92,7 @@
   .bar { height: 100%; background: var(--accent); transition: width 0.1s; }
   .stats { display: flex; gap: 1.5rem; flex-wrap: wrap; }
   .value.pending { color: var(--text-muted); }
-  .value.ref { color: var(--text-muted); }
+  .value.ref, .value.train { color: var(--text-muted); }
   .small-v { font-size: 1.1rem !important; padding-top: 0.4rem; }
   .conf { overflow-x: auto; }
 </style>
