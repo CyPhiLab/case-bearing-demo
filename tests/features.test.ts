@@ -100,3 +100,19 @@ describe('IMS run-to-failure assets', () => {
     expect((end - trend.hours[a.index]) / 24).toBeGreaterThan(2);
   });
 });
+
+describe('Paderborn assets', () => {
+  const pu: Manifest = JSON.parse(readFileSync('public/data/pu/recordings.json', 'utf8'));
+  it('has healthy, machined and real-damage bearings at 12 kHz', () => {
+    expect(pu.fs).toBe(12000);
+    const kinds = new Set(pu.recordings.map((r) => r.damage));
+    expect([...kinds].sort()).toEqual(['machined', 'none', 'real']);
+    for (const r of pu.recordings) expect(readFileSync(`public/data/pu/signals/${r.id}.i16`).byteLength).toBe(2 * pu.nSamples);
+  });
+  it('6203 fault frequencies at 1500 rpm', async () => {
+    const { faultFrequencies, PU_BEARING } = await import('../src/lib/bearing');
+    const f = faultFrequencies(1500, PU_BEARING);
+    expect(f.bpfo).toBeCloseTo(76.4, 0);
+    expect(f.bpfi).toBeCloseTo(123.6, 0);
+  });
+});

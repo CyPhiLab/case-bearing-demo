@@ -102,3 +102,24 @@ export function prepare2D(space: PCASpace, nClasses: number): Prepared & { grid:
 }
 
 export const datasetClasses = (ds: Dataset) => ds.classes.length;
+
+/**
+ * Split by whole recordings (bearings) instead of by time: every window of a training bearing is
+ * used for training (its 'val' block for validation), every window of a test bearing for testing.
+ */
+export function prepareByRecording(rows: Sample[], nClasses: number, isTrain: (rec: number) => boolean, isTest: (rec: number) => boolean): Prepared {
+  const train = rows.filter((r) => isTrain(r.rec) && r.split !== 'val');
+  const val = rows.filter((r) => isTrain(r.rec) && r.split === 'val');
+  const test = rows.filter((r) => isTest(r.rec));
+  const scaler = fitScaler(pickFeatures(train));
+  return {
+    xTrain: transform(scaler, pickFeatures(train)),
+    yTrain: train.map((r) => r.y),
+    xVal: transform(scaler, pickFeatures(val)),
+    yVal: val.map((r) => r.y),
+    xTest: transform(scaler, pickFeatures(test)),
+    yTest: test.map((r) => r.y),
+    nClasses,
+    testRows: test,
+  };
+}

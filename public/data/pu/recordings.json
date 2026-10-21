@@ -1,0 +1,247 @@
+{
+ "fs": 12000,
+ "nSamples": 48000,
+ "frame": 2048,
+ "hop": 1024,
+ "classes": [
+  "Normal",
+  "Ball",
+  "Inner Race",
+  "Outer Race"
+ ],
+ "splits": [
+  {
+   "name": "train",
+   "from": 0.0,
+   "to": 0.7
+  },
+  {
+   "name": "val",
+   "from": 0.7,
+   "to": 0.8
+  },
+  {
+   "name": "test",
+   "from": 0.8,
+   "to": 1.0
+  }
+ ],
+ "bearing": {
+  "model": "6203 deep-groove ball bearing",
+  "balls": 8,
+  "ballDiameter_mm": 6.75,
+  "pitchDiameter_mm": 28.55,
+  "rpm": 1500
+ },
+ "recordings": [
+  {
+   "id": "K001",
+   "source": "N15_M07_F10_K001_1.mat",
+   "cls": "Normal",
+   "size": 0,
+   "scale": 4.10737730361742e-05,
+   "rms": 0.20099475621080118,
+   "label": "K001 \u00b7 Healthy",
+   "damage": "none",
+   "method": "healthy, run-in"
+  },
+  {
+   "id": "K002",
+   "source": "N15_M07_F10_K002_1.mat",
+   "cls": "Normal",
+   "size": 0,
+   "scale": 3.271802218291496e-05,
+   "rms": 0.15658673620071392,
+   "label": "K002 \u00b7 Healthy",
+   "damage": "none",
+   "method": "healthy, run-in"
+  },
+  {
+   "id": "K003",
+   "source": "N15_M07_F10_K003_1.mat",
+   "cls": "Normal",
+   "size": 0,
+   "scale": 4.196959206881244e-05,
+   "rms": 0.18153368004170004,
+   "label": "K003 \u00b7 Healthy",
+   "damage": "none",
+   "method": "healthy, run-in"
+  },
+  {
+   "id": "KA01",
+   "source": "N15_M07_F10_KA01_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 0.00010243908308388725,
+   "rms": 0.4776390962774879,
+   "label": "KA01 \u00b7 Outer Race, machined",
+   "damage": "machined",
+   "method": "EDM notch"
+  },
+  {
+   "id": "KA03",
+   "source": "N15_M07_F10_KA03_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 3.297616086491438e-05,
+   "rms": 0.2270943569425754,
+   "label": "KA03 \u00b7 Outer Race, machined",
+   "damage": "machined",
+   "method": "electric engraver"
+  },
+  {
+   "id": "KA07",
+   "source": "N15_M07_F10_KA07_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 2.6391346404517533e-05,
+   "rms": 0.15929085835535994,
+   "label": "KA07 \u00b7 Outer Race, machined",
+   "damage": "machined",
+   "method": "drilling"
+  },
+  {
+   "id": "KI01",
+   "source": "N15_M07_F10_KI01_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 0.0001320878343779209,
+   "rms": 0.4402902875580562,
+   "label": "KI01 \u00b7 Inner Race, machined",
+   "damage": "machined",
+   "method": "EDM notch"
+  },
+  {
+   "id": "KI03",
+   "source": "N15_M07_F10_KI03_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 2.151583390756651e-05,
+   "rms": 0.14715404742328786,
+   "label": "KI03 \u00b7 Inner Race, machined",
+   "damage": "machined",
+   "method": "electric engraver"
+  },
+  {
+   "id": "KI07",
+   "source": "N15_M07_F10_KI07_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 3.3392509382711644e-05,
+   "rms": 0.16802434766622484,
+   "label": "KI07 \u00b7 Inner Race, machined",
+   "damage": "machined",
+   "method": "electric engraver"
+  },
+  {
+   "id": "KA04",
+   "source": "N15_M07_F10_KA04_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 6.292585800239087e-05,
+   "rms": 0.3746707728635454,
+   "label": "KA04 \u00b7 Outer Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  },
+  {
+   "id": "KA15",
+   "source": "N15_M07_F10_KA15_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 2.0157731768268797e-05,
+   "rms": 0.14710787935493636,
+   "label": "KA15 \u00b7 Outer Race, real",
+   "damage": "real",
+   "method": "plastic deformation (indentations)"
+  },
+  {
+   "id": "KA16",
+   "source": "N15_M07_F10_KA16_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 7.200870538567555e-05,
+   "rms": 0.43667160566245594,
+   "label": "KA16 \u00b7 Outer Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  },
+  {
+   "id": "KA22",
+   "source": "N15_M07_F10_KA22_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 2.180724020287646e-05,
+   "rms": 0.14348302513078567,
+   "label": "KA22 \u00b7 Outer Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  },
+  {
+   "id": "KA30",
+   "source": "N15_M07_F10_KA30_1.mat",
+   "cls": "Outer Race",
+   "size": 0,
+   "scale": 4.033436828885255e-05,
+   "rms": 0.2710518219763271,
+   "label": "KA30 \u00b7 Outer Race, real",
+   "damage": "real",
+   "method": "plastic deformation (indentations)"
+  },
+  {
+   "id": "KI04",
+   "source": "N15_M07_F10_KI04_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 4.6348150535442704e-05,
+   "rms": 0.26554299245854274,
+   "label": "KI04 \u00b7 Inner Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  },
+  {
+   "id": "KI14",
+   "source": "N15_M07_F10_KI14_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 2.094183205775349e-05,
+   "rms": 0.15217993609613875,
+   "label": "KI14 \u00b7 Inner Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  },
+  {
+   "id": "KI16",
+   "source": "N15_M07_F10_KI16_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 7.501520246505981e-05,
+   "rms": 0.31932944199233343,
+   "label": "KI16 \u00b7 Inner Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  },
+  {
+   "id": "KI18",
+   "source": "N15_M07_F10_KI18_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 5.5637562507830655e-05,
+   "rms": 0.2613763162714804,
+   "label": "KI18 \u00b7 Inner Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  },
+  {
+   "id": "KI21",
+   "source": "N15_M07_F10_KI21_1.mat",
+   "cls": "Inner Race",
+   "size": 0,
+   "scale": 2.6861822633179264e-05,
+   "rms": 0.1829911952415923,
+   "label": "KI21 \u00b7 Inner Race, real",
+   "damage": "real",
+   "method": "fatigue pitting"
+  }
+ ]
+}

@@ -19,6 +19,7 @@
   import { app, results } from '../lib/state.svelte';
   import EarlyWarning from '../lib/viz/EarlyWarning.svelte';
   import CrossMachine from '../lib/viz/CrossMachine.svelte';
+  import MachinedVsReal from '../lib/viz/MachinedVsReal.svelte';
 
   let { ds }: { ds: Dataset } = $props();
   const rows = $derived(featureTable(ds));
@@ -121,6 +122,8 @@
       { key: 'cnn', model: 'CNN', input: 'raw 2048 samples' },
       { key: 'cnnNoise', model: 'CNN + heavy noise', input: 'raw 2048 samples' },
       { key: 'ood', model: 'MLP, unseen defect size', input: '18 features' },
+      { key: 'puMachined', model: 'MLP, machined → real damage', input: '18 features' },
+      { key: 'puMixed', model: 'MLP, machined + some real → real', input: '18 features' },
     ].map((r) => ({ ...r, res: results[r.key] })),
   );
 </script>
@@ -258,6 +261,16 @@
     <CrossMachine {models} />
   </div>
 
+  <div class="card" style="margin-top: 1rem">
+    <h3>Stress test #3: machined faults → real damage</h3>
+    <p class="small secondary">
+      The Paderborn bearings let us ask the question CWRU can't: if you train on artificially made faults, will the model recognize
+      <i>real</i> ones? Here healthy, inner-race and outer-race windows are split by <b>whole bearings</b>, so every test bearing is new to
+      the model.
+    </p>
+    <MachinedVsReal />
+  </div>
+
   <div class="grid-2" style="margin-top: 1rem">
     <div class="card">
       <h3>Your results on this page</h3>
@@ -292,6 +305,7 @@
     <ul>
       <li>Case Western Reserve University Bearing Data Center: <a href="https://engineering.case.edu/bearingdatacenter">engineering.case.edu/bearingdatacenter</a></li>
       <li>NASA/IMS run-to-failure data: J. Lee, H. Qiu, G. Yu, J. Lin, and Rexnord Technical Services (2007), "Bearing Data Set," IMS, University of Cincinnati, NASA Prognostics Data Repository. See also H. Qiu et al. (2006), <i>Journal of Sound and Vibration</i> 289, 1066–1090.</li>
+      <li>Paderborn KAt Bearing DataCenter (CC BY-NC 4.0): C. Lessmeier, J. K. Kimotho, D. Zimmer, W. Sextro (2016), "Condition Monitoring of Bearing Damage in Electromechanical Drive Systems by Using Motor Current Signals of Electric Motors: A Benchmark Data Set for Data-Driven Classification," PHM Society European Conference. <a href="https://mb.uni-paderborn.de/kat/datacenter">mb.uni-paderborn.de/kat/datacenter</a></li>
       <li>W. A. Smith &amp; R. B. Randall (2015), "Rolling element bearing diagnostics using the Case Western Reserve University data: A benchmark study," <i>Mechanical Systems and Signal Processing</i> 64–65.</li>
       <li>The Python behind this page (data prep, features, CNN training): the <code>pipeline/</code> folder of this site's GitHub repository.</li>
       <li>3Blue1Brown, <a href="https://www.3blue1brown.com/topics/neural-networks">Neural networks</a> · Google, <a href="https://developers.google.com/machine-learning/crash-course">ML Crash Course</a></li>

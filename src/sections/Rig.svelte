@@ -4,9 +4,9 @@
   import Predict from '../lib/ui/Predict.svelte';
   import Quiz from '../lib/ui/Quiz.svelte';
   import BearingAnim, { type DefectSite } from '../lib/viz/BearingAnim.svelte';
-  import { BEARING, IMS_BEARING, faultFrequencies } from '../lib/bearing';
+  import { BEARING, IMS_BEARING, PU_BEARING, faultFrequencies } from '../lib/bearing';
 
-  const RIGS = [BEARING, IMS_BEARING];
+  const RIGS = [BEARING, IMS_BEARING, PU_BEARING];
   let rigIdx = $state(0);
   const geom = $derived(RIGS[rigIdx]);
   let defect = $state<DefectSite>('outer');
@@ -50,6 +50,7 @@
         <div class="seg" role="group" aria-label="Test rig">
           <button aria-pressed={rigIdx === 0} onclick={() => pickRig(0)} title={BEARING.rig}>CWRU · {BEARING.model}</button>
           <button aria-pressed={rigIdx === 1} onclick={() => pickRig(1)} title={IMS_BEARING.rig}>NASA/IMS · {IMS_BEARING.model}</button>
+          <button aria-pressed={rigIdx === 2} onclick={() => pickRig(2)} title={PU_BEARING.rig}>Paderborn · 6203</button>
         </div>
       </div>
       <div class="control">
@@ -73,6 +74,14 @@
     <div style="margin-top: 1rem">
       <BearingAnim {rpm} {defect} {slowmo} {playing} geometry={geom} />
     </div>
+    {#if rigIdx === 2}
+      <p class="small secondary rig-note">
+        <b>A third experiment: real damage on demand.</b> At Paderborn University, engineers damaged small 6203 bearings two ways. Some
+        were damaged <i>artificially</i>, like CWRU, with EDM, drilling or an electric engraver. Others were run to <i>real</i> damage
+        (fatigue pitting) on accelerated life-test rigs. Then they recorded all of them on the same motor test stand. That lets us ask a
+        sharp question in section 9: does a model trained on machined faults recognize real ones?
+      </p>
+    {/if}
     {#if rigIdx === 1}
       <p class="small secondary rig-note">
         <b>A second, very different experiment.</b> The CWRU rig has pits <i>machined</i> into its bearings on purpose. On the NASA/IMS

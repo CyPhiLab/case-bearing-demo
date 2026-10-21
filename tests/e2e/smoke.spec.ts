@@ -92,3 +92,15 @@ test('run-to-failure data: life slider, early warning and cross-machine test', a
   await expect(page.locator('#rig').getByText('wore out on its own')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test('Paderborn: machined vs real comparison, PCA toggle and stress test', async ({ page }) => {
+  const errors = await open(page);
+  await expect(page.locator('#signal .card', { hasText: 'Machined damage vs. the real thing' }).getByText('KA04: fatigue pitting')).toBeAttached({ timeout: 30_000 });
+  await page.locator('#pca button', { hasText: 'Paderborn' }).click();
+  await expect(page.locator('#pca').getByText('19 bearings at 1500 rpm')).toBeVisible({ timeout: 30_000 });
+  const card = page.locator('#diagnose .card', { hasText: 'Stress test #3' });
+  await card.locator('button.primary').click();
+  await expect(card.locator('.stat .value')).toHaveText(/%/, { timeout: 60_000 });
+  expect(parseFloat((await card.locator('.stat .value').textContent())!)).toBeLessThan(70); // machined → real generalizes poorly
+  expect(errors).toEqual([]);
+});

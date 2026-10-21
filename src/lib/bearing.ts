@@ -40,6 +40,20 @@ export const IMS_BEARING: BearingGeometry = {
   element: 'roller',
 };
 
+// Paderborn (KAt) test rig: 6203 deep-groove ball bearing, run at 1500 rpm in the data used here.
+export const PU_BEARING: BearingGeometry = {
+  model: '6203 ball bearing',
+  rig: 'Paderborn KAt rig (machined and real damage)',
+  balls: 8,
+  ballDiameter: 6.75 / 25.4,
+  pitchDiameter: 28.55 / 25.4,
+  innerDiameter: 17 / 25.4,
+  outerDiameter: 40 / 25.4,
+  contactAngle: 0,
+  rpm: 1500,
+  element: 'ball',
+};
+
 export const RIG_RPM = 1772; // 1 hp load
 
 export interface FaultFrequencies {

@@ -11,15 +11,15 @@ trained offline and **runs live** with TensorFlow.js. The site is plain static f
 
 | # | Section | Students can… | Builds on lecture |
 |---|---------|---------------|-------------------|
-| 1 | The bearing | Watch an animated bearing strike a defect (CWRU SKF 6205 or IMS Rexnord ZA-2115), change rpm, and see BPFO/BPFI/BSF computed from geometry | – |
-| 2 | Look & listen | Browse all 10 recordings, **listen to them** (with ¼-speed playback), zoom the waveform with expected impact spacing overlaid, view the spectrum and envelope spectrum with fault-frequency markers. Then step through a week-long **run-to-failure** test and watch the BPFO line appear | Data: plot your data |
+| 1 | The bearing | Watch an animated bearing strike a defect (CWRU SKF 6205, IMS Rexnord ZA-2115 or Paderborn 6203), change rpm, and see BPFO/BPFI/BSF computed from geometry | – |
+| 2 | Look & listen | Browse all 10 recordings, **listen to them** (with ¼-speed playback), zoom the waveform with expected impact spacing overlaid, view the spectrum and envelope spectrum with fault-frequency markers. Then step through a week-long **run-to-failure** test and watch the BPFO line appear, and compare **machined vs. real** damage | Data: plot your data |
 | 3 | Windows | Slice a recording into windows, change window size and overlap, and see the count / resolution trade-offs | Data: how much data |
 | 4 | Features | See all 18 features computed live for any window, with strip plots per class and a two-feature scatter, plus health indicators trended over the IMS bearings' life | Data: normalization |
-| 5 | PCA | Project the 18-D feature space to 2-D, hide labels, read the scree plot and loadings | NN: embedding / PCA |
+| 5 | PCA | Project the 18-D feature space to 2-D (CWRU or Paderborn), hide labels, read the scree plot and loadings | NN: embedding / PCA |
 | 6 | Logistic regression | Train it live in the PCA plane (≈74%, straight boundaries) and on all 18 features (≈100%), and inspect the coefficient heatmap | Regression: logistic regression |
 | 7 | Neural network | Same PCA plane with an MLP (≈99%, curved boundaries), plus a full playground (layers, neurons, activation, learning rate, dropout, L2, training-set size, **mislabeled labels**) with a live network diagram and loss curves. "Make it overfit" memorizes bad labels (~99% train / ~75% test), and the "Fix: add L2" / "Fix: more data" buttons recover it | Data: bad labels, overfitting, regularization; NN: backprop, dropout |
 | 8 | CNN | Feed raw test windows (optionally noisy) through the pretrained CNN, **step through a convolution** with the network's real filter, and see learned filters, their frequency responses and feature maps, plus a noise-robustness sweep | NN: types of networks |
-| 9 | Diagnose | A "be the diagnostician" game against the three models, a stress test on an **unseen defect size** (accuracy collapses, showing out-of-distribution behavior), an **early-warning alarm** on the IMS run-to-failure data (anomaly detection, no labels), a **cross-machine test** (the CWRU models on the IMS bearing, showing domain shift), a summary and takeaways | Intro: out of distribution |
+| 9 | Diagnose | A "be the diagnostician" game against the three models, a stress test on an **unseen defect size** (accuracy collapses, showing out-of-distribution behavior), an **early-warning alarm** on the IMS run-to-failure data (anomaly detection, no labels), a **cross-machine test** (the CWRU models on the IMS bearing, showing domain shift), a **machined → real damage** test on Paderborn (~40% accuracy, ~60% once some real examples are added), a summary and takeaways | Intro: out of distribution |
 
 **Two modes** (toggle at the top right, or link with `?mode=lecture`):
 
@@ -58,6 +58,15 @@ four bearings (RMS, kurtosis, crest factor, envelope amplitude at BPFO = 236 Hz)
 (resampled to 12 kHz, as the CWRU models expect), and 16 raw snapshots for listening. That's about 0.9 MB in `public/data/ims/`, loaded
 lazily.
 
+### Paderborn real vs. machined damage
+
+From the [KAt Bearing DataCenter](https://mb.uni-paderborn.de/kat/datacenter) at Paderborn University (**CC BY-NC 4.0**: non-commercial
+use with attribution, cite Lessmeier et al. 2016). `pipeline/prepare_paderborn.py` downloads 19 of the 32 bearing archives
+(~3.2 GB, once) and extracts one 4 s measurement per bearing at operating point N15_M07_F10 (1500 rpm, 0.7 Nm, 1000 N). It keeps the
+vibration channel only, resampled from 64 kHz to 12 kHz, about 1.8 MB in `public/data/pu/`. The bearings: healthy K001–K003; machined
+KA01/KA03/KA07 (outer) and KI01/KI03/KI07 (inner); real damage KA04/KA15/KA16/KA22/KA30 (outer) and KI04/KI14/KI16/KI18/KI21 (inner).
+In the stress test, data is split by **whole bearings**, so the test bearings are never seen in training.
+
 ## Run it locally
 
 ```bash
@@ -84,6 +93,9 @@ python pipeline/train_cnn.py      # ~3 min on a laptop CPU; writes public/data/c
 # NASA/IMS run-to-failure (needs 7z + unrar/unar to unpack): 4. Bearings.zip -> IMS.7z -> 2nd_test.rar
 curl -L -o data-cache/ims.zip "https://phm-datasets.s3.amazonaws.com/NASA/4.+Bearings.zip"
 python pipeline/prepare_ims.py --raw data-cache/ims/2nd_test
+
+# Paderborn (downloads 19 .rar archives, ~3.2 GB; needs `unar`)
+python pipeline/prepare_paderborn.py
 npm test                          # confirms the browser code still matches
 ```
 
@@ -109,6 +121,7 @@ tests/               vitest unit tests + Playwright smoke tests
 
 Data: [Case Western Reserve University Bearing Data Center](https://engineering.case.edu/bearingdatacenter), and the IMS bearing
 data set (J. Lee, H. Qiu, G. Yu, J. Lin and Rexnord Technical Services, IMS, University of Cincinnati, 2007; NASA Prognostics Data
-Repository). Feature set adapted
+Repository), and the Paderborn KAt Bearing DataCenter (C. Lessmeier, J. K. Kimotho, D. Zimmer, W. Sextro, PHM Europe 2016;
+CC BY-NC 4.0). Feature set adapted
 from [L. G. Di Maggio](https://github.com/LGDiMaggio/CWRU-bearing-fault-classification-ML). See also W. A. Smith & R. B. Randall
 (2015), *Rolling element bearing diagnostics using the Case Western Reserve University data: A benchmark study*, MSSP 64–65.

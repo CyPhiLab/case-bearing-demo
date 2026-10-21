@@ -10,6 +10,11 @@ export interface RecordingMeta {
   size: number; // defect diameter, mil (0 for Normal)
   scale: number;
   rms: number;
+  /** display label (otherwise derived from class + defect size) */
+  label?: string;
+  /** Paderborn: how the damage came about */
+  damage?: 'none' | 'machined' | 'real';
+  method?: string;
 }
 
 export interface Manifest {
@@ -70,22 +75,27 @@ export function buildDataset(manifest: Manifest, buffers: ArrayBuffer[]): Datase
       ...m,
       clsIndex: manifest.classes.indexOf(m.cls),
       signal: decodeSignal(buffers[i], m.scale),
-      label: recordingLabel(m),
+      label: m.label ?? recordingLabel(m),
     })),
   };
 }
 
-let cached: Promise<Dataset> | null = null;
+const cached = new Map<string, Promise<Dataset>>();
 
-export function loadDataset(): Promise<Dataset> {
-  cached ??= (async () => {
-    const manifest: Manifest = await (await fetch(dataUrl('recordings.json'))).json();
-    const buffers = await Promise.all(
-      manifest.recordings.map(async (r) => (await fetch(dataUrl(`signals/${r.id}.i16`))).arrayBuffer()),
+/** Load a dataset exported by the pipeline. `base` is '' for CWRU, 'pu/' for Paderborn. */
+export function loadDataset(base = ''): Promise<Dataset> {
+  if (!cached.has(base))
+    cached.set(
+      base,
+      (async () => {
+        const manifest: Manifest = await (await fetch(dataUrl(`${base}recordings.json`))).json();
+        const buffers = await Promise.all(
+          manifest.recordings.map(async (r) => (await fetch(dataUrl(`${base}signals/${r.id}.i16`))).arrayBuffer()),
+        );
+        return buildDataset(manifest, buffers);
+      })(),
     );
-    return buildDataset(manifest, buffers);
-  })();
-  return cached;
+  return cached.get(base)!;
 }
 
 /** Window start indices that lie entirely inside one split region (mirrors pipeline/common.py). */
@@ -104,12 +114,13 @@ export function splitRegions(n: number, splits: Manifest['splits']) {
   return splits.map((s) => ({ split: s.name, lo: Math.round(s.from * n), hi: Math.round(s.to * n) }));
 }
 
-const featureCache = new Map<string, Sample[]>();
+const featureCache = new WeakMap<Dataset, Map<string, Sample[]>>();
 
 /** Every window of every recording turned into an 18-feature sample. */
 export function featureTable(ds: Dataset, frame = ds.frame, hop = ds.hop): Sample[] {
   const key = `${frame}/${hop}`;
-  const hit = featureCache.get(key);
+  if (!featureCache.has(ds)) featureCache.set(ds, new Map());
+  const hit = featureCache.get(ds)!.get(key);
   if (hit) return hit;
   const rows: Sample[] = [];
   ds.recordings.forEach((r, ri) => {
@@ -117,6 +128,6 @@ export function featureTable(ds: Dataset, frame = ds.frame, hop = ds.hop): Sampl
       rows.push({ rec: ri, start, split, y: r.clsIndex, x: allFeatures(r.signal.subarray(start, start + frame)) });
     }
   });
-  featureCache.set(key, rows);
+  featureCache.get(ds)!.set(key, rows);
   return rows;
 }

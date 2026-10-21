@@ -1,11 +1,12 @@
 <script lang="ts">
   import { CLASS_NAMES, CLASS_SHAPES, classVar, markerPath } from '../classes';
 
-  let { extra = [] }: { extra?: { label: string; svg: string }[] } = $props();
+  let { extra = [], only }: { extra?: { label: string; svg: string }[]; only?: number[] } = $props();
 </script>
 
 <div class="legend" role="list" aria-label="legend">
   {#each CLASS_NAMES as name, i}
+    {#if !only || only.includes(i)}
     <span role="listitem">
       <svg width="14" height="14" viewBox="-7 -7 14 14" aria-hidden="true">
         <path
@@ -17,6 +18,7 @@
       </svg>
       {name}
     </span>
+    {/if}
   {/each}
   {#each extra as e}
     <span role="listitem">{@html e.svg}{e.label}</span>

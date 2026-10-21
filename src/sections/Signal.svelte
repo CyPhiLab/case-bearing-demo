@@ -11,6 +11,7 @@
   import { classVar } from '../lib/classes';
   import * as audio from '../lib/audio';
   import IMSLife from '../lib/viz/IMSLife.svelte';
+  import PUCompare from '../lib/viz/PUCompare.svelte';
 
   let { ds }: { ds: Dataset } = $props();
 
@@ -272,6 +273,17 @@
       looks dramatic.
     </p>
     <IMSLife />
+  </div>
+
+  <div class="card" style="margin-top: 1rem">
+    <h3>Machined damage vs. the real thing</h3>
+    <p class="small secondary">
+      Both CWRU and many textbook examples use <i>machined</i> faults: a neat notch or hole. Real damage from fatigue looks different, with
+      rough, spread-out pitting. These recordings come from Paderborn University (third rig in section 1), where the same kind of 6203
+      bearing was damaged both ways and measured on the same test stand. Compare the waveforms and envelope spectra, and listen. How
+      different do they sound?
+    </p>
+    <PUCompare />
   </div>
 </Section>
 

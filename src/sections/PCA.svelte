@@ -6,13 +6,20 @@
   import ClassLegend from '../lib/charts/ClassLegend.svelte';
   import LineChart from '../lib/charts/LineChart.svelte';
   import { app } from '../lib/state.svelte';
-  import { featureTable, type Dataset } from '../lib/data';
+  import { featureTable, loadDataset, type Dataset } from '../lib/data';
   import { FEATURES } from '../lib/dsp/features';
   import { pcaSpace } from '../lib/ml/prep';
   import { CLASS_NAMES, classVar } from '../lib/classes';
 
-  let { ds }: { ds: Dataset } = $props();
+  let { ds: cwru }: { ds: Dataset } = $props();
 
+  // dataset toggle: the CWRU windows, or the Paderborn bearings (machined + real damage)
+  let which = $state<'cwru' | 'pu'>('cwru');
+  let pu = $state<Dataset | null>(null);
+  $effect(() => {
+    if (which === 'pu' && !pu) loadDataset('pu/').then((d) => (pu = d));
+  });
+  const ds = $derived(which === 'pu' && pu ? pu : cwru);
   const rows = $derived(featureTable(ds));
   let selected = $state<boolean[]>(FEATURES.map(() => true));
   let showLabels = $state(true);
@@ -64,25 +71,51 @@
               <button onclick={() => preset('freq')} aria-pressed={cols.length === 7 && selected[17]}>Frequency only</button>
             </div>
           </div>
+          <div class="control">
+            Dataset
+            <div class="seg">
+              <button aria-pressed={which === 'cwru'} onclick={() => (which = 'cwru')}>CWRU</button>
+              <button aria-pressed={which === 'pu'} onclick={() => (which = 'pu')}>Paderborn{which === 'pu' && !pu ? ' …' : ''}</button>
+            </div>
+          </div>
           <label class="check"><input type="checkbox" bind:checked={showLabels} /> Color by true label</label>
         </div>
       </div>
       {#if space}
         <ScatterPlot
-          points={space.coords.map((c, i) => ({ x: c[0], y: c[1], cls: showLabels ? rows[i].y : 0 }))}
+          points={space.coords.map((c, i) => ({
+            x: c[0],
+            y: c[1],
+            cls: showLabels ? rows[i].y : 0,
+            hollow: showLabels && ds.recordings[rows[i].rec].damage === 'machined',
+          }))}
           xLabel="PC1 ({pct(explained[0])} of variance)"
           yLabel="PC2 ({pct(explained[1])} of variance)"
           height={app.mode === 'lecture' ? 520 : 440}
           radius={3.2}
           onhover={(i) => (hovered = i)}
           onselect={(i) => {
+            if (ds !== cwru) return;
             app.rec = rows[i].rec;
             app.windowStart = rows[i].start;
           }}
           tooltip={(i) => `<b>${showLabels ? CLASS_NAMES[rows[i].y] : 'Hidden label'}</b>${showLabels ? ` · ${ds.recordings[rows[i].rec].label}` : ''}`}
           ariaLabel="PCA projection of all windows"
         />
-        {#if showLabels}<ClassLegend />{:else}<p class="small muted">This is all PCA sees: unlabelled points. Do you see clusters?</p>{/if}
+        {#if showLabels}
+          <ClassLegend
+            only={ds === cwru ? undefined : [0, 2, 3]}
+            extra={ds === cwru
+              ? []
+              : [{ label: 'hollow = machined damage, filled = real damage', svg: '<svg width="14" height="14" viewBox="-7 -7 14 14"><circle r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>' }]}
+          />
+          {#if ds !== cwru}
+            <p class="small secondary">
+              Paderborn, {ds.recordings.length} bearings at 1500 rpm. Each bearing forms its own cluster, real and machined damage of the
+              same type often land in different places, and the classes overlap far more than CWRU's. This is a much harder problem.
+            </p>
+          {/if}
+        {:else}<p class="small muted">This is all PCA sees: unlabelled points. Do you see clusters?</p>{/if}
       {:else}
         <p class="muted">Pick at least two features.</p>
       {/if}
