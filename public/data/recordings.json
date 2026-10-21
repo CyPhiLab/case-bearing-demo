@@ -1,0 +1,111 @@
+{
+ "fs": 12000,
+ "nSamples": 120000,
+ "frame": 2048,
+ "hop": 1024,
+ "classes": [
+  "Normal",
+  "Ball",
+  "Inner Race",
+  "Outer Race"
+ ],
+ "splits": [
+  {
+   "name": "train",
+   "from": 0.0,
+   "to": 0.7
+  },
+  {
+   "name": "val",
+   "from": 0.7,
+   "to": 0.8
+  },
+  {
+   "name": "test",
+   "from": 0.8,
+   "to": 1.0
+  }
+ ],
+ "recordings": [
+  {
+   "id": "normal",
+   "source": "1772_Normal.npz",
+   "cls": "Normal",
+   "size": 0,
+   "scale": 8.624608989053805e-06,
+   "rms": 0.06161543805359572
+  },
+  {
+   "id": "ball_7",
+   "source": "1772_B_7_DE12.npz",
+   "cls": "Ball",
+   "size": 7,
+   "scale": 2.0131506145702916e-05,
+   "rms": 0.13907196891834572
+  },
+  {
+   "id": "ball_14",
+   "source": "1772_B_14_DE12.npz",
+   "cls": "Ball",
+   "size": 14,
+   "scale": 4.088762932522966e-05,
+   "rms": 0.1411527513531012
+  },
+  {
+   "id": "ball_21",
+   "source": "1772_B_21_DE12.npz",
+   "cls": "Ball",
+   "size": 21,
+   "scale": 4.50071273816392e-05,
+   "rms": 0.12928644680147924
+  },
+  {
+   "id": "ir_7",
+   "source": "1772_IR_7_DE12.npz",
+   "cls": "Inner Race",
+   "size": 7,
+   "scale": 4.8244229945821425e-05,
+   "rms": 0.2928630050110106
+  },
+  {
+   "id": "ir_14",
+   "source": "1772_IR_14_DE12.npz",
+   "cls": "Inner Race",
+   "size": 14,
+   "scale": 6.195606102166832e-05,
+   "rms": 0.16532196669087382
+  },
+  {
+   "id": "ir_21",
+   "source": "1772_IR_21_DE12.npz",
+   "cls": "Inner Race",
+   "size": 21,
+   "scale": 0.00011249303206386688,
+   "rms": 0.44190520382864323
+  },
+  {
+   "id": "or_7",
+   "source": "1772_OR@6_7_DE12.npz",
+   "cls": "Outer Race",
+   "size": 7,
+   "scale": 9.498144736559169e-05,
+   "rms": 0.5922379304115866
+  },
+  {
+   "id": "or_14",
+   "source": "1772_OR@6_14_DE12.npz",
+   "cls": "Outer Race",
+   "size": 14,
+   "scale": 1.2257574758012891e-05,
+   "rms": 0.0935659335529851
+  },
+  {
+   "id": "or_21",
+   "source": "1772_OR@6_21_DE12.npz",
+   "cls": "Outer Race",
+   "size": 21,
+   "scale": 0.00018942998734121466,
+   "rms": 0.5605366170734861
+  }
+ ]
+}
