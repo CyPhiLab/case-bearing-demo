@@ -17,6 +17,10 @@
     starts to fail, it vibrates in a very particular way. Here we'll use real measurements recorded in a lab right here at Case to go
     from <b>raw accelerometer data</b> to a <b>machine-learning diagnosis</b>, one step at a time.
   </p>
+  <p class="lede small-lede">
+    Along the way, two more real datasets show where lab results break down: a bearing that wore out on its own over a week (NASA/IMS),
+    and machined vs. real fatigue damage (Paderborn University).
+  </p>
 
   <ol class="pipeline" aria-label="Pipeline overview">
     {#each STEPS as s, i}
@@ -65,6 +69,7 @@
   }
   h1 em { font-style: normal; color: var(--cls-2); }
   .lede { font-size: 1.15rem; color: var(--text-secondary); max-width: 64ch; }
+  .small-lede { font-size: 1rem; }
   .pipeline {
     list-style: none;
     padding: 0;

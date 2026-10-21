@@ -13,7 +13,7 @@
 
   const MAX = 12;
   let width = $state(600);
-  const padL = 128, padR = 96, padT = 26, padB = 16;
+  const padL = 142, padR = 96, padT = 26, padB = 16;
 
   // which real node indices we draw for each layer
   const shown = $derived(sizes.map((n, l) => (l === 0 || l === sizes.length - 1 || n <= MAX ? [...Array(n).keys()] : [...Array(MAX).keys()])));

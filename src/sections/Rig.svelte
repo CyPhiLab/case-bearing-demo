@@ -4,13 +4,20 @@
   import Predict from '../lib/ui/Predict.svelte';
   import Quiz from '../lib/ui/Quiz.svelte';
   import BearingAnim, { type DefectSite } from '../lib/viz/BearingAnim.svelte';
-  import { BEARING, RIG_RPM, faultFrequencies } from '../lib/bearing';
+  import { BEARING, IMS_BEARING, PU_BEARING, faultFrequencies } from '../lib/bearing';
 
+  const RIGS = [BEARING, IMS_BEARING, PU_BEARING];
+  let rigIdx = $state(0);
+  const geom = $derived(RIGS[rigIdx]);
   let defect = $state<DefectSite>('outer');
-  let rpm = $state(RIG_RPM);
+  let rpm = $state(BEARING.rpm);
   let slowmo = $state(60);
   let playing = $state(true);
-  const ff = $derived(faultFrequencies(rpm));
+  const ff = $derived(faultFrequencies(rpm, geom));
+  function pickRig(i: number) {
+    rigIdx = i;
+    rpm = RIGS[i].rpm;
+  }
 
   const SITES: { id: DefectSite; label: string }[] = [
     { id: 'none', label: 'Healthy' },
@@ -39,6 +46,14 @@
   <div class="card">
     <div class="controls">
       <div class="control">
+        Rig
+        <div class="seg" role="group" aria-label="Test rig">
+          <button aria-pressed={rigIdx === 0} onclick={() => pickRig(0)} title={BEARING.rig}>CWRU · {BEARING.model}</button>
+          <button aria-pressed={rigIdx === 1} onclick={() => pickRig(1)} title={IMS_BEARING.rig}>NASA/IMS · {IMS_BEARING.model}</button>
+          <button aria-pressed={rigIdx === 2} onclick={() => pickRig(2)} title={PU_BEARING.rig}>Paderborn · 6203</button>
+        </div>
+      </div>
+      <div class="control">
         Defect location
         <div class="seg" role="group" aria-label="Defect location">
           {#each SITES as s}
@@ -57,8 +72,24 @@
       <button onclick={() => (playing = !playing)}>{playing ? '❚❚ Pause' : '▶ Play'}</button>
     </div>
     <div style="margin-top: 1rem">
-      <BearingAnim {rpm} {defect} {slowmo} {playing} />
+      <BearingAnim {rpm} {defect} {slowmo} {playing} geometry={geom} />
     </div>
+    {#if rigIdx === 2}
+      <p class="small secondary rig-note">
+        <b>A third experiment: real damage on demand.</b> At Paderborn University, engineers damaged small 6203 bearings two ways. Some
+        were damaged <i>artificially</i>, like CWRU, with EDM, drilling or an electric engraver. Others were run to <i>real</i> damage
+        (fatigue pitting) on accelerated life-test rigs. Then they recorded all of them on the same motor test stand. That lets us ask a
+        sharp question in section 9: does a model trained on machined faults recognize real ones?
+      </p>
+    {/if}
+    {#if rigIdx === 1}
+      <p class="small secondary rig-note">
+        <b>A second, very different experiment.</b> The CWRU rig has pits <i>machined</i> into its bearings on purpose. On the NASA/IMS
+        rig (University of Cincinnati), four of these large roller bearings ran at 2000 rpm under a 6000 lb load, around the clock, until
+        one of them <i>wore out on its own</i> after about 7 days. Nobody knew in advance which bearing would fail, or how. You'll see its
+        data in sections 2, 4 and 9.
+      </p>
+    {/if}
   </div>
 
   <Predict question="The outer race doesn't move, but the inner race spins with the shaft. Which defect do you think the balls hit more often each second?">
@@ -73,8 +104,9 @@
     <div class="card">
       <h3>Every fault has its own frequency</h3>
       <p class="small secondary">
-        From the bearing's geometry ({BEARING.balls} balls, ball diameter d = {BEARING.ballDiameter}″, pitch diameter D =
-        {BEARING.pitchDiameter}″), you can predict exactly how often each kind of defect gets struck.
+        From the {geom.model}'s geometry ({geom.balls} {geom.element}s, {geom.element} diameter d = {geom.ballDiameter}″, pitch diameter D =
+        {geom.pitchDiameter}″{geom.contactAngle ? `, contact angle φ = ${((geom.contactAngle * 180) / Math.PI).toFixed(2)}°` : ''}), you can
+        predict exactly how often each kind of defect gets struck.
       </p>
       <table class="ff">
         <thead><tr><th>Frequency</th><th></th><th class="r">Hz</th><th class="r">× shaft</th></tr></thead>
@@ -128,6 +160,7 @@
   .seg button { border-radius: 0; margin-left: -1px; }
   .seg button:first-child { border-radius: 8px 0 0 8px; margin-left: 0; }
   .seg button:last-child { border-radius: 0 8px 8px 0; }
+  .rig-note { margin: 0.8rem 0 0; max-width: 90ch; }
   .ff { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
   .ff th { text-align: left; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; border-bottom: 1px solid var(--grid); padding: 0.3rem 0.4rem; }
   .ff td { padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--grid); }

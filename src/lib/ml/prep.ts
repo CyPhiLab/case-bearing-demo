@@ -2,6 +2,7 @@
 import type { Dataset, Sample } from '../data';
 import { fitPCA, fitScaler, projectPCA, transform, type PCAModel } from './linalg';
 import type { TrainData } from './trainTypes';
+import { mulberry32 } from './mlp';
 
 export interface Prepared extends TrainData {
   testRows: Sample[];
@@ -14,6 +15,23 @@ export interface PrepOptions {
   trainFraction?: number;
   /** recordings whose windows are all moved to the test set (e.g. an unseen defect size) */
   holdoutRecs?: (rec: number) => boolean;
+  /** fraction of training windows given a wrong (random other) label; validation/test stay clean */
+  labelNoise?: number;
+  seed?: number;
+}
+
+/** Simulate sloppy labelling: relabel a fixed fraction of examples to a different, random class. */
+export function corruptLabels(y: number[], frac: number, nClasses: number, seed = 7): number[] {
+  if (!frac) return y;
+  const rand = mulberry32(seed);
+  const order = y.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  const out = y.slice();
+  for (const i of order.slice(0, Math.round(frac * y.length))) out[i] = (y[i] + 1 + Math.floor(rand() * (nClasses - 1))) % nClasses;
+  return out;
 }
 
 function pickFeatures(rows: Sample[], cols?: number[]) {
@@ -39,7 +57,7 @@ export function prepare(rows: Sample[], nClasses: number, o: PrepOptions = {}): 
   const scaler = fitScaler(pickFeatures(train, o.features));
   return {
     xTrain: transform(scaler, pickFeatures(train, o.features)),
-    yTrain: train.map((r) => r.y),
+    yTrain: corruptLabels(train.map((r) => r.y), o.labelNoise ?? 0, nClasses, o.seed),
     xVal: transform(scaler, pickFeatures(val, o.features)),
     yVal: val.map((r) => r.y),
     xTest: transform(scaler, pickFeatures(test, o.features)),
@@ -84,3 +102,24 @@ export function prepare2D(space: PCASpace, nClasses: number): Prepared & { grid:
 }
 
 export const datasetClasses = (ds: Dataset) => ds.classes.length;
+
+/**
+ * Split by whole recordings (bearings) instead of by time: every window of a training bearing is
+ * used for training (its 'val' block for validation), every window of a test bearing for testing.
+ */
+export function prepareByRecording(rows: Sample[], nClasses: number, isTrain: (rec: number) => boolean, isTest: (rec: number) => boolean): Prepared {
+  const train = rows.filter((r) => isTrain(r.rec) && r.split !== 'val');
+  const val = rows.filter((r) => isTrain(r.rec) && r.split === 'val');
+  const test = rows.filter((r) => isTest(r.rec));
+  const scaler = fitScaler(pickFeatures(train));
+  return {
+    xTrain: transform(scaler, pickFeatures(train)),
+    yTrain: train.map((r) => r.y),
+    xVal: transform(scaler, pickFeatures(val)),
+    yVal: val.map((r) => r.y),
+    xTest: transform(scaler, pickFeatures(test)),
+    yTest: test.map((r) => r.y),
+    nClasses,
+    testRows: test,
+  };
+}

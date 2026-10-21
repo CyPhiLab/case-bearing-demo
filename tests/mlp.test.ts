@@ -46,3 +46,14 @@ describe('hand-written MLP', () => {
     expect(m.evaluate(pts, lab).acc).toBeGreaterThan(0.95);
   });
 });
+
+describe('label noise', async () => {
+  const { corruptLabels } = await import('../src/lib/ml/prep');
+  it('flips exactly the requested fraction, always to a different class, deterministically', () => {
+    const y = Array.from({ length: 200 }, (_, i) => i % 4);
+    const a = corruptLabels(y, 0.3, 4, 3);
+    expect(a.filter((v, i) => v !== y[i]).length).toBe(60);
+    expect(corruptLabels(y, 0.3, 4, 3)).toEqual(a);
+    expect(corruptLabels(y, 0, 4)).toEqual(y);
+  });
+});

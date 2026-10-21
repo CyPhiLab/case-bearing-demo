@@ -21,5 +21,22 @@ describe('pretrained CNN in TensorFlow.js matches PyTorch', async () => {
       probs.forEach((p, i) => expect(Math.log(p)).toBeCloseTo(Math.log(c.probs[i]), 1));
       expect(activations.length).toBe(spec.conv.length);
     });
+
+    it(`${c.id}: a hand-computed first convolution matches the network's conv1 layer`, () => {
+      const meta = manifest.recordings.find((r) => r.id === c.id)!;
+      const b = readFileSync(`public/data/signals/${c.id}.i16`);
+      const sig = decodeSignal(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength), meta.scale);
+      const win = sig.subarray(c.start, c.start + spec.frame);
+      const x = cnn.normalize(win);
+      const conv1 = cnn.run(win).activations[0];
+      for (const f of [0, 5, 11]) {
+        const k = cnn.kernels[f];
+        for (const t of [0, 100, 777, conv1.length - 1]) {
+          let s = cnn.conv1Bias[f];
+          for (let j = 0; j < k.length; j++) s += x[t + j] * k[j];
+          expect(conv1[t][f]).toBeCloseTo(Math.max(0, s), 4);
+        }
+      }
+    });
   }
 });

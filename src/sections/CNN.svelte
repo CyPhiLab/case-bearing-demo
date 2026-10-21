@@ -7,6 +7,7 @@
   import RecordingPicker from '../lib/ui/RecordingPicker.svelte';
   import LineChart from '../lib/charts/LineChart.svelte';
   import Heatmap from '../lib/charts/Heatmap.svelte';
+  import ConvAnimation from '../lib/viz/ConvAnimation.svelte';
   import Confusion from '../lib/charts/Confusion.svelte';
   import { app, results } from '../lib/state.svelte';
   import { windowStarts, type Dataset } from '../lib/data';
@@ -199,6 +200,17 @@
           {/each}
         </div>
       {/if}
+    </div>
+
+    <div class="card" style="margin-top: 1rem">
+      <h3>How a convolution works, one step at a time</h3>
+      <p class="small secondary self-only">
+        This is the network's real first layer at work on the window above. A filter of 32 learned weights sits on 32 input samples. Multiply
+        them pairwise, add up the products and the bias, then apply ReLU. That gives <i>one</i> output value. Slide over by one sample and
+        repeat, 2017 times. Wherever the signal locally looks like the filter, the products line up in sign and the output spikes. That's
+        why the output spikes at the impacts.
+      </p>
+      <ConvAnimation {cnn} {input} fs={ds.fs} />
     </div>
 
     <div class="card" style="margin-top: 1rem">

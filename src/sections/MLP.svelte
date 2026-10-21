@@ -43,11 +43,12 @@
   let dropout = $state(0);
   let l2 = $state(0);
   let trainFraction = $state(1);
+  let labelNoise = $state(0);
   const hidden = $derived([width1, width2, width3].slice(0, layers));
 
   const full = new TrainingRun();
   onDestroy(() => full.dispose());
-  const data = $derived(prepare(rows, 4, { trainFraction }));
+  const data = $derived(prepare(rows, 4, { trainFraction, labelNoise }));
   function trainFull() {
     full.start(
       { ...DEFAULT_CONFIG, model: 'mlp', hidden: $state.snapshot(hidden), activation, lr, epochs, dropout, l2, sendWeights: true },
@@ -55,7 +56,7 @@
     );
   }
   $effect(() => {
-    if (full.result) results.mlp18 = { acc: full.result.testAcc, detail: `${hidden.join('-')} ${activation}, ${Math.round(trainFraction * 100)}% of training data` };
+    if (full.result) results.mlp18 = { acc: full.result.testAcc, detail: `${hidden.join('-')} ${activation}, ${Math.round(trainFraction * 100)}% of training data${labelNoise ? `, ${Math.round(labelNoise * 100)}% mislabeled` : ''}` };
   });
 
   // network diagram follows the controls until a run reports real weights for the same shape
@@ -64,11 +65,13 @@
     full.weights && full.weights.length === sizes.length - 1 && full.weights.every((k, l) => k.length === sizes[l] && k[0].length === sizes[l + 1]) ? full.weights : null,
   );
 
+  // Calibrated with the browser MLP (seed 42): overfit ≈ 99% train / 75% test; +L2 ≈ 74% / 95%;
+  // more data ≈ 88% test; more data + L2 ≈ 100%.
   function overfitPreset() {
-    layers = 2; width1 = 128; width2 = 64; dropout = 0; l2 = 0; trainFraction = 0.04; epochs = 200; lr = 0.003;
+    layers = 2; width1 = 128; width2 = 64; dropout = 0; l2 = 0; trainFraction = 0.1; labelNoise = 0.3; epochs = 300; lr = 0.003; activation = 'relu';
   }
   function resetPreset() {
-    layers = 2; width1 = 128; width2 = 64; dropout = 0; l2 = 0; trainFraction = 1; epochs = 60; lr = 0.003; activation = 'relu';
+    layers = 2; width1 = 128; width2 = 64; dropout = 0; l2 = 0; trainFraction = 1; labelNoise = 0; epochs = 60; lr = 0.003; activation = 'relu';
   }
 </script>
 
@@ -119,7 +122,9 @@
     <div class="head">
       <h3>B. Neural-network playground (all 18 features)</h3>
       <div class="presets">
-        <button onclick={overfitPreset} title="Huge network, 4% of the data, many epochs">Make it overfit</button>
+        <button onclick={overfitPreset} title="Big network, 10% of the data, 30% of its labels wrong, many epochs">Make it overfit</button>
+        <button onclick={() => (l2 = 0.03)} disabled={!labelNoise} title="Penalize large weights">Fix: add L2</button>
+        <button onclick={() => (trainFraction = 1)} disabled={!labelNoise} title="Use every training window">Fix: more data</button>
         <button onclick={resetPreset}>Reset</button>
       </div>
     </div>
@@ -163,11 +168,15 @@
       </label>
       <label class="control">
         <span>L2 regularization <b>{l2}</b></span>
-        <input type="range" min="0" max="0.01" step="0.0005" bind:value={l2} />
+        <input type="range" min="0" max="0.05" step="0.001" bind:value={l2} />
       </label>
       <label class="control">
         <span>Training data used <b>{Math.round(trainFraction * 100)}% · {data.xTrain.length} windows</b></span>
         <input type="range" min="0.02" max="1" step="0.02" bind:value={trainFraction} />
+      </label>
+      <label class="control">
+        <span>Mislabeled training windows <b>{Math.round(labelNoise * 100)}%</b></span>
+        <input type="range" min="0" max="0.4" step="0.05" bind:value={labelNoise} />
       </label>
     </div>
 
@@ -194,8 +203,9 @@
   <div class="self-only experiments">
     <h3>Experiments to try</h3>
     <ol>
-      <li><b>Overfitting.</b> Click <i>Make it overfit</i> and train. With only a few dozen training windows and about 10,000 weights, the training loss dives to zero while the validation loss levels off or climbs. That widening gap is the overfitting signature from the Data lecture.</li>
-      <li><b>Regularization.</b> Keep the tiny training set, then add 30–50% dropout or some L2 and retrain. Does the validation curve behave better?</li>
+      <li><b>Overfitting.</b> Click <i>Make it overfit</i> and train. The setup is a big network (about 10,000 weights), only 80 training windows, and 30% of them carrying the <i>wrong</i> label: the "bad labels" problem from the Data lecture. The network memorizes the mistakes. Training accuracy climbs to ~100%, but validation loss turns around and climbs while test accuracy stalls near 75%.</li>
+      <li><b>Regularization.</b> Now click <i>Fix: add L2</i> and retrain. Training accuracy <i>drops</i> to ~70%, which is about the fraction of labels that are actually right, while test accuracy jumps to ~95%. The penalty on large weights stops the network from bending itself around every wrong label. Dropout (40–50%) has a similar effect.</li>
+      <li><b>More data.</b> <i>Fix: more data</i> uses all 810 windows (still 30% mislabeled). It's harder to memorize, so the test score improves. Combine it with L2 and it reaches ~100%. The dashed line on the loss chart marks the lowest validation loss, which is where <b>early stopping</b> would have stopped.</li>
       <li><b>Learning rate.</b> Set it to the maximum. The loss curve gets jumpy, because the steps overshoot. Set it very low and training crawls.</li>
       <li><b>Activations.</b> Swap ReLU for sigmoid with 3 layers. Training is noticeably slower, which shows the vanishing-gradient issue in miniature.</li>
     </ol>

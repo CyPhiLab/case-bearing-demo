@@ -27,7 +27,16 @@ export class BearingCNN {
     private model: tf.Sequential,
     private probe: tf.LayersModel,
     readonly kernels: number[][], // first-layer filters [filter][tap]
+    readonly conv1Bias: number[],
   ) {}
+
+  /** z-score a raw window (g) exactly as the network's input expects. */
+  normalize(window: ArrayLike<number>): Float32Array {
+    const { mean, std, frame } = this.spec;
+    const norm = new Float32Array(frame);
+    for (let i = 0; i < frame; i++) norm[i] = (window[i] - mean) / std;
+    return norm;
+  }
 
   static async load(specUrl: string, weightsUrl: string, fetchFn: typeof fetch = fetch): Promise<BearingCNN> {
     const spec: CNNSpec = await (await fetchFn(specUrl)).json();
@@ -75,16 +84,16 @@ export class BearingCNN {
         tap[0].forEach((v, f) => (acc[f] ??= []).push(v));
         return acc;
       }, []);
+    const conv1Bias = Array.from(tensors['conv1.bias'].dataSync());
     tf.dispose(Object.values(tensors));
     const probe = tf.model({ inputs: m.inputs, outputs: [...reluLayers.map((l) => l.output as tf.SymbolicTensor), m.outputs[0]] });
-    return new BearingCNN(spec, m, probe, kernels);
+    return new BearingCNN(spec, m, probe, kernels, conv1Bias);
   }
 
   /** Classify one raw window (acceleration in g). */
   run(window: ArrayLike<number>): CNNOutput {
-    const { mean, std, frame } = this.spec;
-    const norm = new Float32Array(frame);
-    for (let i = 0; i < frame; i++) norm[i] = (window[i] - mean) / std;
+    const { frame } = this.spec;
+    const norm = this.normalize(window);
     return tf.tidy(() => {
       const outs = this.probe.predict(tf.tensor3d(norm, [1, frame, 1])) as tf.Tensor[];
       const probs = (outs[outs.length - 1].arraySync() as number[][])[0];

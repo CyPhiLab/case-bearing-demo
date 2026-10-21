@@ -85,3 +85,34 @@ describe('bearing kinematics', () => {
     expect(2 * f.bsf).toBeCloseTo(4.7135, 3);
   });
 });
+
+describe('IMS run-to-failure assets', () => {
+  const trend = JSON.parse(readFileSync('public/data/ims/trend.json', 'utf8'));
+  it('uses the Rexnord ZA-2115 outer-race frequency', async () => {
+    const { faultFrequencies, IMS_BEARING } = await import('../src/lib/bearing');
+    expect(faultFrequencies(2000, IMS_BEARING).bpfo).toBeCloseTo(trend.bpfo, 6);
+  });
+  it('alarms on the failing bearing days before the end', async () => {
+    const { firstAlarm } = await import('../src/lib/ims');
+    const a = firstAlarm(trend.indicators.envBPFO[0], trend.hours, 24, 5);
+    const end = trend.hours.at(-1);
+    expect(a.index).toBeGreaterThan(0);
+    expect((end - trend.hours[a.index]) / 24).toBeGreaterThan(2);
+  });
+});
+
+describe('Paderborn assets', () => {
+  const pu: Manifest = JSON.parse(readFileSync('public/data/pu/recordings.json', 'utf8'));
+  it('has healthy, machined and real-damage bearings at 12 kHz', () => {
+    expect(pu.fs).toBe(12000);
+    const kinds = new Set(pu.recordings.map((r) => r.damage));
+    expect([...kinds].sort()).toEqual(['machined', 'none', 'real']);
+    for (const r of pu.recordings) expect(readFileSync(`public/data/pu/signals/${r.id}.i16`).byteLength).toBe(2 * pu.nSamples);
+  });
+  it('6203 fault frequencies at 1500 rpm', async () => {
+    const { faultFrequencies, PU_BEARING } = await import('../src/lib/bearing');
+    const f = faultFrequencies(1500, PU_BEARING);
+    expect(f.bpfo).toBeCloseTo(76.4, 0);
+    expect(f.bpfi).toBeCloseTo(123.6, 0);
+  });
+});

@@ -8,6 +8,7 @@
   import StripPlot from '../lib/charts/StripPlot.svelte';
   import ScatterPlot from '../lib/charts/ScatterPlot.svelte';
   import ClassLegend from '../lib/charts/ClassLegend.svelte';
+  import LifeTrend from '../lib/viz/LifeTrend.svelte';
   import { app } from '../lib/state.svelte';
   import { featureTable, type Dataset } from '../lib/data';
   import { FEATURES, allFeatures } from '../lib/dsp/features';
@@ -128,6 +129,16 @@
       0 to 20, while the band energies are fractions. That's why we <b>z-score</b> them before training (Data lecture), so no feature
       dominates just because its numbers are bigger.
     </p>
+  </div>
+
+  <div class="card" style="margin-top: 1rem">
+    <h3>Features over a bearing's life</h3>
+    <p class="small secondary">
+      Features aren't only classifier inputs. Plotted over time, they become <b>condition-monitoring</b> signals. These are the four
+      bearings of the NASA/IMS run-to-failure test, one value every 10 minutes for a week. Bearing 1 failed at the end. Compare the
+      indicators: which one wakes up first, and which one gives the clearest margin over its normal level?
+    </p>
+    <LifeTrend />
   </div>
 
   <Quiz
