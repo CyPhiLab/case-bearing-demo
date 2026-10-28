@@ -128,12 +128,17 @@
   const fmtMs = (v: number) => `${((v - t0) * 1000).toFixed(span < 0.1 ? 0 : 0)}`;
 </script>
 
-<Section id="signal" num={2} kicker="Look & listen" title="What does a broken bearing sound like?" lecture="Data: plot your data!">
+<Section id="signal" num={2} kicker="Measured signals" title="Time signals, spectra and envelope analysis" lecture="Data: plot your data!">
   <p class="self-only">
     These are real recordings from the drive-end accelerometer at 1772 rpm (1 hp load): one healthy bearing and three defect sizes for
-    each fault location. Each recording is 10 s long, which is 120,000 numbers. Before any machine learning, <b>plot your data</b>, and
-    in this case, listen to it too.
+    each fault location. Each recording is 10 s long, or 120,000 samples. Before any machine learning, the data should be <b>plotted</b>. Here they can also
+    be listened to.
   </p>
+  <dl class="defs self-only">
+    <dt>Time signal</dt><dd>Acceleration (in g) against time. Impacts appear as short bursts, repeated at the fault frequency.</dd>
+    <dt>Spectrum</dt><dd>The amplitude of each frequency component, computed with the FFT. It shows which resonances the impacts excite.</dd>
+    <dt>Envelope spectrum</dt><dd>The spectrum of the signal's envelope after band-pass filtering around a resonance. It shows how often the resonance is excited, which is the fault frequency.</dd>
+  </dl>
 
   <div class="card">
     <RecordingPicker {ds} bind:value={app.rec} />
@@ -192,14 +197,14 @@
         </select>
       </label>
       <label class="check"><input type="checkbox" bind:checked={equalize} /> Equalize loudness</label>
-      <span class="muted small self-only">Tip: try headphones. Untick "equalize" to hear how much louder the faults really are.</span>
+      <span class="muted small self-only">Headphones are recommended. Untick "equalize" to hear the actual difference in loudness.</span>
     </div>
   </div>
 
   <Predict question="Listen to Healthy, then Outer race 7 mil at ¼ speed. What changed besides the volume?">
     <p>
-      The healthy bearing is a smooth hiss. The faulty one adds a regular <b>tick-tick-tick</b>, the impacts from the animation in
-      section 1. At ¼ speed, the outer-race fault ticks about 26 times per second (BPFO ≈ 106 Hz ÷ 4).
+      The healthy bearing produces a smooth hiss. The faulty one adds a regular sequence of <b>clicks</b>: the impacts shown in the
+      animation in section 1. At ¼ speed, the outer-race fault ticks about 26 times per second (BPFO ≈ 106 Hz ÷ 4).
     </p>
   </Predict>
 
@@ -220,14 +225,14 @@
         ariaLabel="Frequency spectrum"
       />
       <p class="small secondary self-only">
-        Impacts are very short, so their energy spreads across kilohertz and excites the housing's <b>resonances</b>. Notice the hump
-        of energy at 2–5 kHz that healthy bearings don't have. The fault <i>rate</i> (~100–160 Hz) is hidden in how that energy comes and
-        goes.
+        Impacts are very short, so their energy is spread over several kilohertz and excites the <b>resonances</b> of the housing. Note the
+        broad band of energy at 2–5 kHz, which the healthy bearing does not have. The fault <i>rate</i> (~100–160 Hz) is contained in the way
+        this energy rises and decays with each impact.
       </p>
     </div>
     <div class="card">
       <div class="head">
-        <h3>Envelope spectrum <span class="muted small">how often the resonance gets "rung"</span></h3>
+        <h3>Envelope spectrum <span class="muted small">rate at which the resonance is excited</span></h3>
       </div>
       <LineChart
         series={[{ x: envCut.freq, y: envCut.amp, color: classVar(rec.clsIndex), width: 1.4, label: 'envelope amplitude' }]}
@@ -253,35 +258,34 @@
 
   <div class="self-only explain">
     <p>
-      <b>Envelope analysis</b> is the vibration analyst's classic trick. Band-pass filter around the resonance, take the envelope (the
-      magnitude of the analytic signal), then take the FFT of <i>that</i>. Inner- and outer-race faults light up exactly at BPFI and
-      BPFO, the frequencies we predicted from geometry in section 1.
+      <b>Envelope analysis</b> is a standard technique in bearing diagnostics. The signal is band-pass filtered around the resonance, its
+      envelope (the magnitude of the analytic signal) is computed, and the FFT of the envelope is taken. Inner- and outer-race faults then
+      produce peaks at BPFI and BPFO, the frequencies calculated from the geometry in section 1.
     </p>
     <p>
-      Real data is messier than textbooks. Try the <b>ball</b> faults and the <b>outer race 14 mil</b> recording. Their envelope
-      spectra don't show the "right" line cleanly. Researchers who benchmarked this dataset (Smith &amp; Randall, 2015) found the same
-      thing. That's a big reason to let a model learn from many features at once instead of relying on a single rule.
+      Measured data are less clean than textbook examples. For the <b>ball</b> faults and the <b>outer race 14 mil</b> recording, the
+      envelope spectra do not show the expected line clearly. Researchers who benchmarked this dataset (Smith &amp; Randall, 2015) reported the same
+      result. This is one reason to use a model that combines many features rather than a single diagnostic rule.
     </p>
   </div>
 
   <div class="card" style="margin-top: 1rem">
-    <h3>Meanwhile, on another rig: a bearing that failed on its own</h3>
+    <h3>Run-to-failure data (NASA/IMS)</h3>
     <p class="small secondary">
-      Machined pits are "born" fully formed. Real bearings wear out gradually. This is bearing 1 of the NASA/IMS run-to-failure test
-      (the second rig in section 1). It was recorded for one second every 10 minutes for a week, until its outer race failed. Drag through
-      its life and listen. Watch for the day the <b>BPFO line at 236 Hz</b> appears in the envelope spectrum, long before the waveform
-      looks dramatic.
+      A machined pit is present at full size from the start, whereas real damage develops gradually. This is bearing 1 of the NASA/IMS run-to-failure test
+      (the second rig in section 1). It was recorded for one second every 10 minutes for a week, until its outer race failed. Use the slider to move
+      through the test, and note when the <b>BPFO line at 236 Hz</b> appears in the envelope spectrum, well before the waveform changes
+      noticeably.
     </p>
     <IMSLife />
   </div>
 
   <div class="card" style="margin-top: 1rem">
-    <h3>Machined damage vs. the real thing</h3>
+    <h3>Machined vs. real damage (Paderborn)</h3>
     <p class="small secondary">
-      Both CWRU and many textbook examples use <i>machined</i> faults: a neat notch or hole. Real damage from fatigue looks different, with
-      rough, spread-out pitting. These recordings come from Paderborn University (third rig in section 1), where the same kind of 6203
-      bearing was damaged both ways and measured on the same test stand. Compare the waveforms and envelope spectra, and listen. How
-      different do they sound?
+      CWRU and many textbook examples use <i>machined</i> faults: a clean notch or hole. Fatigue damage is different: rough pitting
+      spread over a larger area. These recordings come from Paderborn University (third rig in section 1), where the same kind of 6203
+      bearing was damaged both ways and measured on the same test stand. Compare the waveforms, the envelope spectra and the sound.
     </p>
     <PUCompare />
   </div>

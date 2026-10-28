@@ -60,7 +60,7 @@ test('lecture mode hides self-paced material', async ({ page }) => {
 
 test('the overfitting preset overfits, and L2 fixes it', async ({ page }) => {
   await open(page);
-  const card = page.locator('#mlp .card', { hasText: 'Neural-network playground' });
+  const card = page.locator('#mlp .card', { hasText: 'Network settings and training' });
   await card.getByRole('button', { name: 'Make it overfit' }).click();
   await trainAndWait(page, 'mlp', 1);
   expect(await stat(page, 'mlp', 1, 1)).toBeGreaterThan(95); // memorized the training labels...
@@ -72,7 +72,7 @@ test('the overfitting preset overfits, and L2 fixes it', async ({ page }) => {
 
 test('the convolution animation reproduces the network output', async ({ page }) => {
   await open(page);
-  const card = page.locator('#cnn .card', { hasText: 'How a convolution works' });
+  const card = page.locator('#cnn .card', { hasText: 'Convolution, step by step' });
   await expect(card).toBeVisible({ timeout: 30_000 });
   await card.getByRole('button', { name: /Play/ }).click();
   await page.waitForTimeout(1500);
@@ -81,24 +81,24 @@ test('the convolution animation reproduces the network output', async ({ page })
 
 test('run-to-failure data: life slider, early warning and cross-machine test', async ({ page }) => {
   const errors = await open(page);
-  const life = page.locator('#signal .card', { hasText: 'failed on its own' });
+  const life = page.locator('#signal .card', { hasText: 'Run-to-failure data' });
   await expect(life.getByText('Waveform')).toBeVisible({ timeout: 30_000 });
   await life.locator('input[type=range]').fill('12');
   await expect(life.getByText(/day 6\.\d/).first()).toBeVisible();
-  const ew = page.locator('#diagnose .card', { hasText: 'early-warning alarm' });
+  const ew = page.locator('#diagnose .card', { hasText: 'Anomaly detection' });
   await expect(ew.locator('tr.failed td').nth(2)).toHaveText(/day 3\.\d/, { timeout: 30_000 });
-  await expect(page.locator('#diagnose .card', { hasText: 'a different machine' }).getByText(/"Outer Race" for \d+%/)).toBeVisible();
+  await expect(page.locator('#diagnose .card', { hasText: 'Generalization to a different machine' }).getByText(/"Outer Race" for \d+%/)).toBeVisible();
   await page.locator('#rig button', { hasText: 'NASA/IMS' }).click();
-  await expect(page.locator('#rig').getByText('wore out on its own')).toBeVisible();
+  await expect(page.locator('#rig').getByText('failed naturally')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
 test('Paderborn: machined vs real comparison, PCA toggle and stress test', async ({ page }) => {
   const errors = await open(page);
-  await expect(page.locator('#signal .card', { hasText: 'Machined damage vs. the real thing' }).getByText('KA04: fatigue pitting')).toBeAttached({ timeout: 30_000 });
+  await expect(page.locator('#signal .card', { hasText: 'Machined vs. real damage' }).getByText('KA04: fatigue pitting')).toBeAttached({ timeout: 30_000 });
   await page.locator('#pca button', { hasText: 'Paderborn' }).click();
   await expect(page.locator('#pca').getByText('19 bearings at 1500 rpm')).toBeVisible({ timeout: 30_000 });
-  const card = page.locator('#diagnose .card', { hasText: 'Stress test #3' });
+  const card = page.locator('#diagnose .card', { hasText: 'Generalization from machined to real damage' });
   await card.locator('button.primary').click();
   await expect(card.locator('.stat .value')).toHaveText(/%/, { timeout: 60_000 });
   expect(parseFloat((await card.locator('.stat .value').textContent())!)).toBeLessThan(70); // machined → real generalizes poorly

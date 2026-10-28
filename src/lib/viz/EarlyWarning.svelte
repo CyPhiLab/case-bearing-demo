@@ -71,9 +71,8 @@
   </table>
   <p class="small secondary">
     Around day 4, bearing 1's <b>{INDICATORS.find((i) => i.key === indicator)!.name}</b> sits about <b>{margin.toFixed(1)}×</b> its normal
-    level. That's the margin you'd have to set a robust alarm in a noisy factory. Notice that the "healthy" bearings 2–4 sometimes alarm
-    late in the test too. They share a shaft with bearing 1 and pick up its vibration, so a real system also compares bearings with each
-    other.
+    level. This is the margin available for setting a robust alarm threshold in a noisy plant. Note that the "healthy" bearings 2–4 sometimes alarm
+    late in the test too. They share a shaft with bearing 1 and pick up its vibration, so a practical system also compares bearings with each other.
   </p>
 {:else}
   <p class="muted small">Loading the run-to-failure data…</p>

@@ -218,7 +218,7 @@
   <div class="trace" bind:clientWidth={traceW}>
     <div class="trace-title">
       <span>Simulated accelerometer signal</span>
-      <span class="muted">last {WINDOW * 1000} ms · {defect === 'none' ? 'healthy: just noise' : 'every strike rings the housing at ~3 kHz'}</span>
+      <span class="muted">last {WINDOW * 1000} ms · {defect === 'none' ? 'healthy: broadband noise only' : 'each strike excites a resonance near 3 kHz'}</span>
     </div>
     <canvas bind:this={canvas} style:width="{traceW}px" style:height="120px" aria-hidden="true"></canvas>
   </div>

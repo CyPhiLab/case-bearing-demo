@@ -64,9 +64,9 @@
   <p class="small secondary">
     {which === 'mlp' ? 'The MLP' : 'Logistic regression'}, trained on CWRU, says <b>"Outer Race" for {Math.round(share(0, DAY_DAMAGE, 3) * 100)}%</b>
     of the snapshots taken while this bearing was still <i>healthy</i>, and {Math.round(share(DAY_DAMAGE, 99, 3) * 100)}% after damage
-    appeared. It ends up "right," but for the wrong reason. This rig has a different bearing, shaft speed, sensor, housing resonance
-    and sampling rate, so every window lands far outside anything the model saw in training. It falls back on whatever class is nearest.
-    That is <b>domain shift</b>, the most common way a lab-trained model fails in a real plant. A model has to be trained on, or at least
+    appeared. Its final prediction is correct, but for the wrong reason. This rig has a different bearing, shaft speed, sensor, housing resonance
+    and sampling rate, so every window lies far outside the training data, and the model assigns the nearest class.
+    That is <b>domain shift</b>, the most common way in which a laboratory-trained model fails in service. A model has to be trained on, or at least
     calibrated to, the machine it will monitor.
   </p>
 {:else}

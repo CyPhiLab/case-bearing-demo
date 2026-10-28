@@ -128,10 +128,10 @@
   );
 </script>
 
-<Section id="diagnose" num={9} kicker="Your turn" title="Be the diagnostician">
+<Section id="diagnose" num={9} kicker="Diagnosis" title="Diagnosis and generalization">
   <p class="self-only">
-    Here's a mystery clip from the held-out test data. Use what you've learned: look at the waveform, check the envelope spectrum for the
-    fault frequencies, then make your call. Three models trained on the same data will make theirs too.
+    The clip below is drawn from the held-out test data. Classify it using the waveform and the envelope spectrum, checking for the
+    fault frequencies. The three models trained on the same data classify it as well.
   </p>
 
   {#if mystery && clip && spec && env}
@@ -165,7 +165,7 @@
           </div>
         </div>
         <div class="answer">
-          <h3>Your diagnosis?</h3>
+          <h3>Your diagnosis</h3>
           <div class="choices">
             {#each CLASS_NAMES as c, k}
               <button
@@ -179,7 +179,7 @@
           </div>
           {#if guess !== null && truth && verdicts}
             <div class="reveal" role="status">
-              <p><b>Answer: {truth.label}</b> {guess === truth.clsIndex ? '✓ You got it.' : '✗ Not this time.'}</p>
+              <p><b>Answer: {truth.label}</b> {guess === truth.clsIndex ? '✓ Correct.' : '✗ Incorrect.'}</p>
               <table>
                 <tbody>
                   {#each [['Logistic regression', verdicts.lr], ['MLP', verdicts.mlp], ['CNN', verdicts.cnn]] as [name, v]}
@@ -207,7 +207,7 @@
 
   <div class="card" style="margin-top: 1rem">
     <div class="head">
-      <h3>Stress test: a defect size the model has never seen</h3>
+      <h3>Generalization to an unseen defect size</h3>
       <div class="controls">
         <label class="control">Hold out
           <select bind:value={heldSize}>
@@ -222,9 +222,8 @@
     <div class="ood">
       <div>
         <p class="secondary">
-          So far, every test window came from a recording the model had already seen during training (just a later part of it). What
-          happens in the field, where a fault's size or shape isn't in the training set? Train an MLP on the other two defect sizes, then
-          test it on <b>{heldSize} mil</b> faults (plus held-out healthy windows).
+          So far, every test window came from a recording that the model had seen during training (a later part of it). In service, a
+    fault's size or shape may not be represented in the training set. Here an MLP is trained on the other two defect sizes and tested on <b>{heldSize} mil</b> faults (plus held-out healthy windows).
         </p>
         {#if ood.result}
           <div class="stat">
@@ -232,9 +231,8 @@
             <span class="label">accuracy on unseen {heldSize} mil defects ({oodData.yTest.length} windows)</span>
           </div>
           <p class="small secondary">
-            Compare that with ~100% when the test windows came from familiar recordings. That's "struggles out of distribution" from the
-            first ML lecture, in action. The fix is better data, covering the conditions the model will actually meet, not a fancier
-            network.
+            Compare this with ~100% when the test windows came from familiar recordings. This is the out-of-distribution problem from the
+    first ML lecture. The remedy is training data that cover the conditions the model will encounter, not a more complex network.
           </p>
         {/if}
       </div>
@@ -243,29 +241,28 @@
   </div>
 
   <div class="card" style="margin-top: 1rem">
-    <h3>Real failures don't come labelled: an early-warning alarm</h3>
+    <h3>Anomaly detection on run-to-failure data</h3>
     <p class="small secondary">
-      On the NASA/IMS rig nobody knew which bearing would fail, so there are no fault labels to train a classifier on. What you <i>can</i>
-      do is learn what "normal" looks like and alarm when a bearing leaves it. That's <b>anomaly detection</b>. Pick a health indicator
-      from section 4, set the alarm threshold, and see how much warning you would have had before bearing 1 failed.
+      On the NASA/IMS rig it was not known which bearing would fail, so there are no fault labels for training a classifier. Instead,
+    the normal behavior can be learned and an alarm raised when a bearing departs from it. This is <b>anomaly detection</b>. Choose a health indicator from section 4 and an alarm threshold, and see how much warning it gives before bearing 1 fails.
     </p>
     <EarlyWarning />
   </div>
 
   <div class="card" style="margin-top: 1rem">
-    <h3>Stress test #2: a different machine</h3>
+    <h3>Generalization to a different machine</h3>
     <p class="small secondary">
-      Would our CWRU-trained classifiers catch the IMS bearing's failure? Each tick below is one 10-minute snapshot of bearing 1,
+      Do the classifiers trained on CWRU data detect the failure of the IMS bearing? Each tick below is one 10-minute snapshot of bearing 1,
       resampled to 12 kHz and turned into the same 18 features, colored by the predicted class.
     </p>
     <CrossMachine {models} />
   </div>
 
   <div class="card" style="margin-top: 1rem">
-    <h3>Stress test #3: machined faults → real damage</h3>
+    <h3>Generalization from machined to real damage</h3>
     <p class="small secondary">
-      The Paderborn bearings let us ask the question CWRU can't: if you train on artificially made faults, will the model recognize
-      <i>real</i> ones? Here healthy, inner-race and outer-race windows are split by <b>whole bearings</b>, so every test bearing is new to
+      The Paderborn bearings make it possible to test what the CWRU data cannot: whether a model trained on artificial faults recognizes
+    <i>real</i> ones. Here healthy, inner-race and outer-race windows are split by <b>whole bearings</b>, so every test bearing is new to
       the model.
     </p>
     <MachinedVsReal />
@@ -273,7 +270,7 @@
 
   <div class="grid-2" style="margin-top: 1rem">
     <div class="card">
-      <h3>Your results on this page</h3>
+      <h3>Summary of results</h3>
       <table class="summary">
         <thead><tr><th>Model</th><th>Input</th><th class="r">Test accuracy</th></tr></thead>
         <tbody>
@@ -290,12 +287,12 @@
     <div class="card">
       <h3>Takeaways</h3>
       <ul class="take">
-        <li><b>Measure well, then plot.</b> Sampling rate, sensor placement and windowing decide what any model can possibly learn.</li>
-        <li><b>Physics-informed features are powerful.</b> 18 numbers and a linear model already separate these classes.</li>
-        <li><b>Neural networks bend boundaries</b> when straight lines aren't enough, at the cost of parameters and interpretability.</li>
+        <li><b>Measure carefully and plot the data first.</b> Sampling rate, sensor placement and windowing decide what any model can possibly learn.</li>
+        <li><b>Physics-informed features are effective.</b> 18 features and a linear model already separate these classes.</li>
+        <li><b>Neural networks form curved boundaries</b> when linear ones are not sufficient, at the cost of parameters and interpretability.</li>
         <li><b>CNNs learn features</b> directly from raw signals, and their first layer rediscovered frequency-selective filtering.</li>
         <li><b>Real failures grow slowly.</b> Trending a physics-informed indicator (envelope at BPFO) gave days of warning on the IMS bearing, with no labels needed.</li>
-        <li><b>Lab accuracy ≠ field accuracy.</b> New fault sizes, loads and machines are out of distribution. Garbage (or narrow data) in, garbage out.</li>
+        <li><b>Lab accuracy ≠ field accuracy.</b> New fault sizes, loads and machines are out of distribution. A model is only reliable within the range of its training data.</li>
       </ul>
     </div>
   </div>

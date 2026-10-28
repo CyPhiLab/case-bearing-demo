@@ -125,6 +125,12 @@
     Suitable sources are a running washing machine, a fan housing, a car dashboard, or walking with the phone in hand.
   </p>
 
+  <dl class="defs self-only">
+    <dt>MEMS accelerometer</dt><dd>A microfabricated proof mass suspended on silicon springs. Its deflection, measured capacitively, is proportional to acceleration along each of three axes.</dd>
+    <dt>Gravity</dt><dd>The sensor measures acceleration including gravity, so a phone lying flat reads about 9.81 m/s² on its z-axis. Subtracting the mean removes this static part.</dd>
+    <dt>Sample rate and jitter</dt><dd>The browser delivers readings at roughly 60 to 200 Hz, and the interval between readings varies. The lab measures both, then interpolates the data onto a uniform time grid before computing the spectrum.</dd>
+  </dl>
+
   <div class="layout" class:mobile>
     {#if !mobile}
       <div class="card qr">

@@ -1,16 +1,16 @@
 <script lang="ts">
   const TOPICS = [
-    { id: 'signal', t: 'What is a signal?' },
-    { id: 'classes', t: 'Static vs dynamic' },
-    { id: 'noise', t: 'Noise vs interference' },
-    { id: 'rms', t: 'Mean, RMS & power' },
-    { id: 'fourier', t: 'Fourier models & transform' },
-    { id: 'sampling', t: 'Sampling, aliasing, quantization' },
-    { id: 'filters', t: 'Filters' },
-    { id: 'convolution', t: 'Convolution' },
-    { id: 'averaging', t: 'Averaging, SNR & dB' },
-    { id: 'mic', t: 'Microphone lab' },
-    { id: 'phone', t: 'Phone accelerometer lab' },
+    { id: 'signal', t: 'What is a signal?', d: 'Definition, transducers and the measurement chain' },
+    { id: 'classes', t: 'Static vs dynamic', d: 'Periodic, aperiodic and random waveforms' },
+    { id: 'noise', t: 'Noise vs interference', d: 'Random and systematic errors in a measured signal' },
+    { id: 'rms', t: 'Mean, RMS & power', d: 'The DC and AC parts of a signal' },
+    { id: 'fourier', t: 'Fourier models & transform', d: 'Fourier series, the DFT, natural frequencies, leakage' },
+    { id: 'sampling', t: 'Sampling, aliasing, quantization', d: 'The Nyquist frequency and ADC resolution' },
+    { id: 'filters', t: 'Filters', d: 'Filter types, moving averages, Butterworth filters' },
+    { id: 'convolution', t: 'Convolution', d: 'How a digital filter computes its output' },
+    { id: 'averaging', t: 'Averaging, SNR & dB', d: 'Decibels, ensemble averaging, Welch spectra' },
+    { id: 'mic', t: 'Microphone lab', d: 'Live spectrum and spectrogram of sound' },
+    { id: 'phone', t: 'Phone accelerometer lab', d: 'Recording and analyzing vibration' },
   ];
 </script>
 
@@ -25,7 +25,7 @@
   </p>
   <ol class="topics">
     {#each TOPICS as tp, i}
-      <li><a href="#{tp.id}"><span class="n">{i + 1}</span>{tp.t}</a></li>
+      <li><a href="#{tp.id}"><span class="n">{i + 1}</span><span><span class="tt">{tp.t}</span><span class="d">{tp.d}</span></span></a></li>
     {/each}
   </ol>
   <div class="how self-only">
@@ -49,6 +49,8 @@
   .topics { list-style: none; padding: 0; margin: 2rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.5rem; }
   .topics a { display: flex; gap: 0.5rem; align-items: baseline; padding: 0.55rem 0.75rem; border-radius: var(--radius); background: var(--surface-1); border: 1px solid var(--grid); color: var(--text-primary); text-decoration: none; font-weight: 600; font-size: 0.92rem; }
   .topics a:hover { border-color: var(--accent); }
+  .tt { display: block; }
+  .d { display: block; font-weight: 400; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.1rem; }
   .n { font-family: var(--mono); font-size: 0.75rem; color: var(--accent-ink); }
   .how { display: grid; gap: 0.4rem; padding: 0.9rem 1rem; border-radius: var(--radius); background: var(--surface-2); font-size: 0.9rem; max-width: 92ch; }
   .tag { font-size: 0.68rem; text-transform: uppercase; color: #fff; padding: 0.05em 0.45em; border-radius: 4px; letter-spacing: 0.05em; }

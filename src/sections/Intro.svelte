@@ -2,8 +2,8 @@
   const STEPS = [
     { id: 'rig', title: 'Physics', text: 'Why a damaged bearing vibrates' },
     { id: 'signal', title: 'Measurement', text: '12,000 samples/s from an accelerometer' },
-    { id: 'windows', title: 'Windows', text: 'Slice 10 s into ~100 examples' },
-    { id: 'features', title: 'Features', text: '2048 numbers → 18 numbers' },
+    { id: 'windows', title: 'Windows', text: 'Divide each 10 s recording into ~100 examples' },
+    { id: 'features', title: 'Features', text: 'Summarize 2048 samples with 18 features' },
     { id: 'logistic', title: 'Models', text: 'Logistic regression → MLP → CNN' },
     { id: 'diagnose', title: 'Diagnosis', text: 'Normal, ball, inner or outer race?' },
   ];
@@ -11,15 +11,15 @@
 
 <div id="top" class="hero">
   <div class="kicker">Case study · Neural networks unit</div>
-  <h1>Can a neural network <em>hear</em> a broken bearing?</h1>
+  <h1>Bearing fault diagnosis with machine learning</h1>
   <p class="lede">
-    Rolling-element bearings hold up nearly every rotating machine: motors, pumps, wind turbines, your car's wheels. When one
-    starts to fail, it vibrates in a very particular way. Here we'll use real measurements recorded in a lab right here at Case to go
-    from <b>raw accelerometer data</b> to a <b>machine-learning diagnosis</b>, one step at a time.
+    Rolling-element bearings support the shafts of almost every rotating machine, including motors, pumps, wind turbines and vehicle
+    wheels. A damaged bearing produces a characteristic vibration. This case study uses accelerometer measurements recorded at Case
+    Western Reserve University and follows each step from <b>raw accelerometer data</b> to a <b>machine-learning diagnosis</b>.
   </p>
   <p class="lede small-lede">
-    Along the way, two more real datasets show where lab results break down: a bearing that wore out on its own over a week (NASA/IMS),
-    and machined vs. real fatigue damage (Paderborn University).
+    Two further datasets show the limits of laboratory results: a bearing that failed naturally during a week-long test (NASA/IMS),
+    and machined versus real fatigue damage (Paderborn University).
   </p>
 
   <ol class="pipeline" aria-label="Pipeline overview">
@@ -36,13 +36,13 @@
 
   <div class="how self-only">
     <div>
-      <b>How to use this page.</b> Everything is interactive: drag sliders, click points, press play. Purple
-      <span class="tag p">Predict</span> boxes ask you to commit to a guess before you look, and blue
+      <b>How to use this page.</b> All figures are interactive. Purple
+      <span class="tag p">Predict</span> boxes ask you to commit to a guess before revealing the answer, and blue
       <span class="tag c">Check</span> boxes are quick self-tests.
     </div>
     <div class="muted small">
-      Teaching from this page? Switch to <b>Lecture</b> mode (top right) for big type and visuals only. PageDown/PageUp (or a
-      presentation clicker) steps through the sections. You can also link straight to it with <code>?mode=lecture</code>.
+      For teaching, switch to <b>Lecture</b> mode (top right) for big type and visuals only. PageDown/PageUp (or a
+      presentation clicker) steps through the sections. You can also link to it directly with <code>?mode=lecture</code>.
     </div>
   </div>
 </div>
@@ -67,7 +67,7 @@
     max-width: 18ch;
     margin-bottom: 1rem;
   }
-  h1 em { font-style: normal; color: var(--cls-2); }
+  
   .lede { font-size: 1.15rem; color: var(--text-secondary); max-width: 64ch; }
   .small-lede { font-size: 1rem; }
   .pipeline {

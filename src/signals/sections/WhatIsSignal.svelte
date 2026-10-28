@@ -92,6 +92,13 @@
     <b>electronic signal</b>. It is then processed, possibly transmitted, and finally displayed or converted back into a physical quantity. The
     same chain applies whatever the measured quantity.
   </p>
+  <dl class="defs self-only">
+    <dt>Transducer</dt><dd>A device that converts one physical quantity into another, usually into a voltage: a microphone, an accelerometer, a thermocouple.</dd>
+    <dt>Signal conditioning</dt><dd>Amplification, filtering and other processing that prepares the transducer output for recording.</dd>
+    <dt>Analog signal</dt><dd>Continuous in time and in amplitude, like the voltage from a microphone.</dd>
+    <dt>Discrete-time signal</dt><dd>Values known only at sampling instants t = iδt, but with any amplitude.</dd>
+    <dt>Digital signal</dt><dd>Discrete in time and in amplitude: what an analog-to-digital converter (ADC) produces, and what a computer stores. Sections 6 and 7 deal with what is lost in this conversion.</dd>
+  </dl>
 
   <div class="card">
     <Seg

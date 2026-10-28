@@ -37,12 +37,17 @@
   const ranges = $derived(FEATURES.map((_, j) => d3.extent(rows, (r) => r.x[j]) as [number, number]));
 </script>
 
-<Section id="features" num={4} kicker="Feature engineering" title="Boil 2048 numbers down to 18" lecture="Data: normalization; numerical features">
+<Section id="features" num={4} kicker="Feature engineering" title="Feature extraction" lecture="Data: normalization; numerical features">
   <p class="self-only">
-    Instead of handing the model 2048 raw samples, we compute a handful of <b>features</b>, numbers that summarize the window. Vibration
-    analysts have used these for decades. There are 11 in the <i>time domain</i> (statistics of the waveform) and 7 in the <i>frequency
-    domain</i> (where the energy sits in the spectrum). Click any feature to see how well it separates the four conditions.
+    Instead of giving the model 2048 raw samples, each window is summarized by a small set of <b>features</b>. These are
+    standard quantities in vibration analysis. There are 11 in the <i>time domain</i> (statistics of the waveform) and 7 in the
+    <i>frequency domain</i> (the distribution of energy in the spectrum). Select a feature to see how well it separates the four conditions.
   </p>
+  <dl class="defs self-only">
+    <dt>Dimensional features</dt><dd>RMS, peak-to-peak, maximum and standard deviation scale with the vibration level, so they depend on load, speed and sensor calibration.</dd>
+    <dt>Dimensionless features</dt><dd>Crest, impulse, shape and clearance factors, kurtosis and skewness are ratios. They describe the <i>shape</i> of the waveform, in particular how impulsive it is, independently of its level.</dd>
+    <dt>Spectral features</dt><dd>Centroid, spread, peak frequency and band energies describe where in frequency the energy lies. Impacts move energy toward the structural resonances.</dd>
+  </dl>
 
   <div class="layout">
     <div class="card list">
@@ -124,19 +129,18 @@
 
   <div class="self-only" style="margin-top: 1rem">
     <p>
-      No single feature separates all four classes, but some pairs come close. That's exactly the job of a classifier: combine features
-      to draw the boundaries between the classes. Notice too that the features live on wildly different scales. Kurtosis runs from about
-      0 to 20, while the band energies are fractions. That's why we <b>z-score</b> them before training (Data lecture), so no feature
-      dominates just because its numbers are bigger.
+      No single feature separates all four classes, but some pairs come close. That is the task of a classifier: to combine features and
+      draw boundaries between the classes. Note also that the features have very different scales. Kurtosis runs from about
+      0 to 20, while the band energies are fractions. For this reason they are <b>z-scored</b> before training (Data lecture), so that no feature dominates
+      only because its values are larger.
     </p>
   </div>
 
   <div class="card" style="margin-top: 1rem">
     <h3>Features over a bearing's life</h3>
     <p class="small secondary">
-      Features aren't only classifier inputs. Plotted over time, they become <b>condition-monitoring</b> signals. These are the four
-      bearings of the NASA/IMS run-to-failure test, one value every 10 minutes for a week. Bearing 1 failed at the end. Compare the
-      indicators: which one wakes up first, and which one gives the clearest margin over its normal level?
+      Features are not only classifier inputs. Plotted over time, they become <b>condition-monitoring</b> signals. These are the four
+      bearings of the NASA/IMS run-to-failure test, one value every 10 minutes for a week. Bearing 1 failed at the end. Compare the indicators: which one rises first, and which one rises furthest above its normal level?
     </p>
     <LifeTrend />
   </div>
@@ -145,7 +149,7 @@
     question="Suppose someone doubles the sensor's gain, so every sample is 2× larger. Which feature would NOT change?"
     options={['RMS', 'Peak-to-peak', 'Crest factor', 'Max |x|']}
     answer={2}
-    explain="Crest factor is a ratio (peak ÷ RMS), and both scale by 2, so it cancels. Dimensionless features like crest, impulse, shape, clearance, kurtosis and skewness are robust to calibration and mounting differences. That's one reason analysts love them."
+    explain="Crest factor is a ratio (peak ÷ RMS), and both scale by 2, so it cancels. Dimensionless features like crest, impulse, shape, clearance, kurtosis and skewness are robust to calibration and mounting differences. This is one reason they are widely used."
   />
 </Section>
 

@@ -52,11 +52,12 @@
   const pct = d3.format('.0%');
 </script>
 
-<Section id="pca" num={5} kicker="Embedding" title="Squash 18 dimensions into 2 you can see" lecture="Neural networks: embedding & PCA">
+<Section id="pca" num={5} kicker="Dimensionality reduction" title="Principal component analysis" lecture="Neural networks: embedding & PCA">
   <p class="self-only">
-    Every window is now a point in an 18-dimensional space, which nobody can picture. <b>Principal component analysis</b> finds the
-    directions along which the data varies most. Projecting onto the top two gives the most informative 2D "shadow" of the cloud.
-    PCA never sees the labels. The colors are added afterward, so we can check whether the classes happen to separate.
+    Each window is now a point in an 18-dimensional space, which cannot be visualized directly. <b>Principal component analysis</b>
+    (PCA) finds the orthogonal directions along which the data vary most, the <i>principal components</i>. Projecting the data onto the
+    first two gives the 2D view that retains the most variance. PCA does not use the labels. The colors are added afterwards, to
+    check whether the classes separate.
   </p>
 
   <div class="layout">
@@ -112,10 +113,10 @@
           {#if ds !== cwru}
             <p class="small secondary">
               Paderborn, {ds.recordings.length} bearings at 1500 rpm. Each bearing forms its own cluster, real and machined damage of the
-              same type often land in different places, and the classes overlap far more than CWRU's. This is a much harder problem.
+              same type often land in different places, and the classes overlap far more than CWRU's. This is a considerably harder problem.
             </p>
           {/if}
-        {:else}<p class="small muted">This is all PCA sees: unlabelled points. Do you see clusters?</p>{/if}
+        {:else}<p class="small muted">This is the input to PCA: unlabelled points. Are there visible clusters?</p>{/if}
       {:else}
         <p class="muted">Pick at least two features.</p>
       {/if}
@@ -145,8 +146,8 @@
           <text x="290" y={110 - 97} text-anchor="end" class="tl">95%</text>
         </svg>
         <p class="small secondary" style="margin: 0.3rem 0 0">
-          Bars show each component's share and dots the running total. PC1 + PC2 capture <b>{pct(cumulative[1] ?? 0)}</b> of the
-          variance. Reaching 95% takes <b>{n95}</b> of {cols.length} components, so many features are partly redundant.
+          Bars show the share of variance explained by each component, and dots the cumulative total. PC1 + PC2 capture <b>{pct(cumulative[1] ?? 0)}</b> of the
+          variance. Reaching 95% takes <b>{n95}</b> of {cols.length} components, so many of the features are partly redundant.
         </p>
       </div>
       <div class="card" style="margin-top: 1rem">
@@ -180,12 +181,11 @@
     </div>
   </div>
 
-  <Predict question="Untick 'Color by true label'. Without the colors, how many clusters would you have guessed?">
+  <Predict question="Untick 'Color by true label'. Without the colors, how many clusters would you identify?">
     <p>
-      Probably six or seven, not four. Several fault classes break into separate islands, one per defect <i>size</i>, because a 7 mil and a
-      21 mil fault really do vibrate differently. The outer-race windows even land in opposite corners of the plot. No single straight
-      line can fence off a class that's split into pieces like that, which is a problem for logistic regression in this 2D view (next
-      section).
+      Probably six or seven, not four. Several fault classes split into separate clusters, one per defect <i>size</i>, because 7 mil and
+      21 mil faults produce different vibration. The outer-race windows fall in opposite corners of the plot. A single straight line cannot
+      separate a class that is split in this way, which limits logistic regression in this 2D view (next section).
     </p>
   </Predict>
 </Section>
