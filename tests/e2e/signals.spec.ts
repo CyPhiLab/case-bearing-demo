@@ -20,6 +20,21 @@ test('signals page: every section renders without errors', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('signals page: every formula renders (no KaTeX errors)', async ({ page }) => {
+  await open(page);
+  const noErrors = () => expect(page.locator('.katex-error')).toHaveCount(0);
+  await noErrors();
+  // formulas that change with the controls
+  for (const k of ['Static', 'Simple periodic', 'Step', 'Ramp', 'Pulse', 'Nondeterministic']) {
+    await page.locator('#classes .list button', { hasText: k }).first().click();
+    await noErrors();
+  }
+  for (const k of ['Sawtooth', 'Triangle', 'Rectified sine']) {
+    await page.locator('#fourier button', { hasText: k }).first().click();
+    await noErrors();
+  }
+});
+
 test('aliasing: a 7.3 Hz sine sampled at 10 Hz looks like 2.7 Hz', async ({ page }) => {
   await open(page);
   await page.locator('#sampling input[type=range]').first().fill('7.3');
