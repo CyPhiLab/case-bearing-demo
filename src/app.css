@@ -167,6 +167,7 @@ select {
   border-radius: 8px;
   padding: 0.3em 0.5em;
   font-size: 0.9rem;
+  max-width: 100%;
 }
 
 input[type='range'] { accent-color: var(--accent); width: 100%; }
@@ -193,6 +194,8 @@ input[type='checkbox'] { accent-color: var(--accent); }
   font-size: 0.85rem;
   color: var(--text-secondary);
   min-width: 140px;
+  max-width: 100%;
+  grid-template-columns: minmax(0, 1fr);
 }
 .control b { color: var(--text-primary); font-variant-numeric: tabular-nums; font-weight: 600; }
 

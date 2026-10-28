@@ -7,7 +7,11 @@ export default defineConfig({
   timeout: 120_000,
   use: {
     baseURL: 'http://localhost:4173/case-bearing-demo/',
-    launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
+    launchOptions: {
+      ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
+      // a synthetic microphone for the Signals Lab mic test
+      args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required'],
+    },
   },
   webServer: {
     command: 'npx vite preview --port 4173 --strictPort',

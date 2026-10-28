@@ -28,6 +28,29 @@ trained offline and **runs live** with TensorFlow.js. The site is plain static f
 
 There's also a light/dark/auto theme toggle.
 
+## Second page: Signals Lab (`/signals/`)
+
+A standalone page for the **Signals & Data** lecture at `https://<owner>.github.io/case-bearing-demo/signals/`. It shares only
+building blocks (charts, theme, modes) with the bearing case study, and follows the slide order. Figliola & Beasley ch. 2 is cited
+as a supplement through small "F&B Eq./Fig./Example" tags.
+
+| # | Section | Students can… | Slides |
+|---|---------|---------------|--------|
+| 1 | What is a signal? | Follow animated measurement chains (phone call, laptop mic, machine vibration, thermometer) | 2 |
+| 2 | Static and dynamic | Generate every waveform class of Table 2.1 with live parameters, then play "classify the signal" | 3–4 |
+| 3 | Noise and interference | Add random noise, drift and 60 Hz hum to y = 2 + sin 2πt and see the time trace and the spectrum | 5 |
+| 4 | Mean and RMS | Move the DC offset, amplitude and N, and watch ȳ, y_rms and y_rms² = ȳ² + σ² update (Ex. 2.1) | 6 |
+| 5 | Fourier review | Fit a Fourier model to data (least squares, R²), build a square/sawtooth/triangle/rectified wave from sines (Ex. 2.4–2.5, Gibbs), find a spring–mass natural frequency, step through the 8-point DFT (Ex. 2.6–2.7), and explore leakage, windowing and zero-padding | 7 |
+| 6 | Sampling | Sweep a sine past f_s/2 (with the spectral-image strip), **hear aliasing** on a sweep with and without an anti-aliasing filter, and quantize with 1–16 bits (SNR ≈ 6.02N + 1.76 dB) | 8 |
+| 7 | Filters | Analog vs digital, LP/HP/BP/BS, SMA vs EMA (lag, √M noise reduction), Butterworth \|G\| for n = 1–8, and a **filter lab** on any clip with presets (remove 60 Hz hum), causal vs zero-phase, and listening | 9–12 |
+| 8 | Convolution | Slide a kernel along a signal step by step (MA, EMA, matched filter, derivative) with its frequency response | – |
+| 9 | Averaging, SNR & dB | dB converter, ensemble averaging (√N), Welch vs a single FFT | – |
+| 10 | Mic lab | **Live microphone**: waveform, spectrum, f₀ and harmonics (clarinet vs brass, Ex. 2.8), averaging, scrolling spectrogram, and recording clips into the other labs. Simulated sources are available without a mic | – |
+| 11 | Phone lab | **Phone accelerometer** (DeviceMotion, iOS permission): measured sample rate and jitter, resampling, RMS, spectrum, CSV download. A QR code is shown on desktop, plus a simulated fan recording with an aliased tone | – |
+
+The filters are a SciPy-compatible Butterworth implementation (`butter(..., output='sos')`, `sosfilt`, `sosfiltfilt`), checked
+against SciPy to 6–7 decimal places in `tests/filters.test.ts`. Microphone and motion data are processed only in the browser.
+
 ## Data and methodology notes (for the instructor)
 
 The data comes from [srigas/CWRU_Bearing_NumPy](https://github.com/srigas/CWRU_Bearing_NumPy), a NumPy copy of the CWRU Bearing Data
@@ -71,8 +94,8 @@ In the stress test, data is split by **whole bearings**, so the test bearings ar
 
 ```bash
 npm ci
-npm run dev          # http://localhost:5173/case-bearing-demo/
-npm test             # unit tests: FFT, features vs Python, PCA vs sklearn, MLP gradients, CNN vs PyTorch
+npm run dev          # http://localhost:5173/case-bearing-demo/  (Signals Lab: /case-bearing-demo/signals/)
+npm test             # unit tests: FFT, features vs Python, PCA vs sklearn, MLP gradients, CNN vs PyTorch, filters vs SciPy
 npm run check        # type-check
 npm run build        # static site in dist/
 npx playwright install chromium && npm run e2e   # browser smoke tests against the build
@@ -96,6 +119,9 @@ python pipeline/prepare_ims.py --raw data-cache/ims/2nd_test
 
 # Paderborn (downloads 19 .rar archives, ~3.2 GB; needs `unar`)
 python pipeline/prepare_paderborn.py
+
+# Signals Lab filter fixtures (SciPy reference responses)
+python pipeline/make_filter_fixture.py
 npm test                          # confirms the browser code still matches
 ```
 
@@ -113,7 +139,10 @@ public/data/         generated: 16-bit signals, metadata, CNN weights
 src/lib/dsp/         FFT, envelope spectrum, the 18 features
 src/lib/ml/          PCA, hand-written MLP (training worker), CNN wrapper (TensorFlow.js)
 src/lib/charts/      canvas/SVG chart components
-src/sections/        one Svelte component per page section
+src/sections/        one Svelte component per page section (bearing case study)
+signals/index.html   entry point of the standalone Signals Lab page
+src/signals/         Signals Lab: sections/, viz/ (interactive figures), lib/ (clips, mic, motion)
+src/lib/dsp/         also filters.ts (Butterworth, moving averages) and signals.ts (generators, DFT, STFT, Welch, …)
 tests/               vitest unit tests + Playwright smoke tests
 ```
 

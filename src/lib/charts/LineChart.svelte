@@ -44,13 +44,15 @@
     markers?: Marker[];
     bands?: Band[];
     logY?: boolean;
+    /** logarithmic x axis (points with x ≤ 0 are skipped) */
+    logX?: boolean;
     /** show a crosshair + tooltip with every series' value */
     hover?: boolean;
     legend?: boolean;
     /** pointer interaction in data coordinates */
     onpoint?: (x: number, phase: 'down' | 'move' | 'up') => void;
     /** extra SVG drawn in plot coordinates */
-    overlay?: import('svelte').Snippet<[{ x: d3.ScaleLinear<number, number>; y: d3.ScaleContinuousNumeric<number, number>; w: number; h: number }]>;
+    overlay?: import('svelte').Snippet<[{ x: d3.ScaleContinuousNumeric<number, number>; y: d3.ScaleContinuousNumeric<number, number>; w: number; h: number }]>;
     ariaLabel?: string;
     margin?: { top: number; right: number; bottom: number; left: number };
   }
@@ -67,6 +69,7 @@
     markers = [],
     bands = [],
     logY = false,
+    logX = false,
     hover = true,
     legend = false,
     onpoint,
@@ -76,6 +79,10 @@
   }: Props = $props();
 
   let width = $state(600);
+  // narrow screens: move the legend into its own band above the plot instead of over it
+  const narrow = $derived(legend && width < 560);
+  const legendRows = $derived(Math.ceil(series.filter((s) => s.label).length / 2));
+  const M = $derived(narrow ? { ...margin, top: margin.top + 17 * legendRows } : margin);
   let canvas: HTMLCanvasElement;
   let hostEl: HTMLDivElement;
   let hoverX = $state<number | null>(null);
@@ -83,15 +90,17 @@
 
   const xAt = (s: LineSeries, i: number) => (s.x ? s.x[i] : (s.xStart ?? 0) + i * (s.dx ?? 1));
 
-  const innerW = $derived(Math.max(10, width - margin.left - margin.right));
-  const innerH = $derived(Math.max(10, height - margin.top - margin.bottom));
+  const innerW = $derived(Math.max(10, width - M.left - M.right));
+  const innerH = $derived(Math.max(10, height - M.top - M.bottom));
 
   const xd = $derived.by((): [number, number] => {
     if (xDomain) return xDomain;
     let lo = Infinity, hi = -Infinity;
     for (const s of series) {
       if (!s.y.length) continue;
-      lo = Math.min(lo, xAt(s, 0));
+      let i = 0;
+      if (logX) while (i < s.y.length - 1 && xAt(s, i) <= 0) i++;
+      lo = Math.min(lo, xAt(s, i));
       hi = Math.max(hi, xAt(s, s.y.length - 1));
     }
     return Number.isFinite(lo) ? [lo, hi] : [0, 1];
@@ -115,19 +124,21 @@
     return [lo - pad, hi + pad];
   });
 
-  const x = $derived(d3.scaleLinear().domain(xd).range([0, innerW]));
+  const x = $derived(
+    (logX ? d3.scaleLog() : d3.scaleLinear()).domain(xd).range([0, innerW]) as d3.ScaleContinuousNumeric<number, number>,
+  );
   const y = $derived(
     (logY ? d3.scaleLog() : d3.scaleLinear()).domain(yd).range([innerH, 0]) as d3.ScaleContinuousNumeric<number, number>,
   );
-  const xTicks = $derived(x.ticks(Math.max(2, Math.floor(innerW / 90))));
   // log axes: label only 1-2-5 steps (or just powers of ten when that is still too many)
-  const yTicks = $derived.by(() => {
-    if (!logY) return y.ticks(Math.max(2, Math.floor(innerH / 45)));
-    const mant = (t: number) => Math.round(t / 10 ** Math.floor(Math.log10(t) + 1e-9));
-    const t125 = y.ticks().filter((t) => [1, 2, 5].includes(mant(t)));
-    return t125.length <= Math.max(3, innerH / 28) ? t125 : t125.filter((t) => mant(t) === 1);
-  });
-  const fx = $derived(xFormat ?? x.tickFormat());
+  const mant = (t: number) => Math.round(t / 10 ** Math.floor(Math.log10(t) + 1e-9));
+  function logTicks(s: d3.ScaleContinuousNumeric<number, number>, room: number) {
+    const t125 = s.ticks().filter((t) => [1, 2, 5].includes(mant(t)));
+    return t125.length <= Math.max(3, room) ? t125 : t125.filter((t) => mant(t) === 1);
+  }
+  const xTicks = $derived(logX ? logTicks(x, innerW / 45) : x.ticks(Math.max(2, Math.floor(innerW / 90))));
+  const yTicks = $derived(logY ? logTicks(y, innerH / 28) : y.ticks(Math.max(2, Math.floor(innerH / 45))));
+  const fx = $derived(xFormat ?? (logX ? d3.format('~g') : x.tickFormat()));
   const fy = $derived(yFormat ?? (logY ? d3.format('~g') : y.tickFormat()));
 
   function resolve(color: string): string {
@@ -159,7 +170,7 @@
     const [a, b] = xd;
     // index range in view (assumes x increasing)
     let i0 = 0, i1 = n - 1;
-    while (i0 < n - 1 && xAt(s, i0 + 1) < a) i0++;
+    while (i0 < n - 1 && (xAt(s, i0 + 1) < a || (logX && xAt(s, i0) <= 0))) i0++;
     while (i1 > 0 && xAt(s, i1 - 1) > b) i1--;
     const count = i1 - i0 + 1;
     const pts: [number, number][] = [];
@@ -237,7 +248,7 @@
 
 <div class="host" bind:this={hostEl} bind:clientWidth={width} style:height="{height}px">
   <svg {width} {height} role="img" aria-label={ariaLabel}>
-    <g transform="translate({margin.left},{margin.top})">
+    <g transform="translate({M.left},{M.top})">
       {#each bands as b}
         {@const bx0 = Math.max(0, x(b.x0))}
         {@const bx1 = Math.min(innerW, x(b.x1))}
@@ -258,14 +269,14 @@
       <line class="axis" x1={0} x2={innerW} y1={innerH} y2={innerH} />
       {#if xLabel}<text class="axis-label" x={innerW / 2} y={innerH + 33} text-anchor="middle">{xLabel}</text>{/if}
       {#if yLabel}
-        <text class="axis-label" transform="translate({-margin.left + 13},{innerH / 2}) rotate(-90)" text-anchor="middle">{yLabel}</text>
+        <text class="axis-label" transform="translate({-M.left + 13},{innerH / 2}) rotate(-90)" text-anchor="middle">{yLabel}</text>
       {/if}
     </g>
   </svg>
   <canvas
     bind:this={canvas}
-    style:left="{margin.left}px"
-    style:top="{margin.top}px"
+    style:left="{M.left}px"
+    style:top="{M.top}px"
     style:width="{innerW}px"
     style:height="{innerH}px"
     class:interactive={!!onpoint}
@@ -286,7 +297,7 @@
     onpointerleave={() => (hoverX = null)}
   ></canvas>
   <svg class="over" {width} {height} aria-hidden="true">
-    <g transform="translate({margin.left},{margin.top})">
+    <g transform="translate({M.left},{M.top})">
       {#each markers as m}
         {#if m.x >= xd[0] && m.x <= xd[1]}
           <line class="marker" x1={x(m.x)} x2={x(m.x)} y1={0} y2={innerH} stroke={m.color ?? 'var(--text-muted)'} stroke-dasharray={m.dash ? '4 3' : undefined} />
@@ -302,7 +313,7 @@
     </g>
   </svg>
   {#if tip}
-    <div class="tooltip" style:left="{Math.min(width - 150, margin.left + x(tip.x) + 12)}px" style:top="{margin.top + 4}px">
+    <div class="tooltip" style:left="{Math.min(width - 150, M.left + x(tip.x) + 12)}px" style:top="{M.top + 4}px">
       <div class="muted">{xLabel ? `${xLabel.replace(/ \(.*\)/, '')}: ` : ''}{fx(tip.x)}</div>
       {#each tip.rows as r}
         <div><span class="swatch" style:background={r.color}></span>{r.label ? `${r.label}: ` : ''}<b class="num">{d3.format('.4~g')(r.v)}</b></div>
@@ -310,7 +321,7 @@
     </div>
   {/if}
   {#if legend}
-    <div class="legend">
+    <div class="legend" class:narrow>
       {#each series.filter((s) => s.label) as s}
         <span><span class="swatch" style:background={s.color}></span>{s.label}</span>
       {/each}
@@ -360,4 +371,6 @@
     padding: 0 0.3rem;
     border-radius: 6px;
   }
+  .legend.narrow { left: 0; right: 0; flex-wrap: wrap; gap: 0.1rem 0.8rem; line-height: 17px; }
+  .legend.narrow > span { flex: 0 0 calc(50% - 0.4rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
