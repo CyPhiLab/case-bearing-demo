@@ -66,6 +66,13 @@
   </Predict>
 
   <h3>Butterworth filters</h3>
+  <p class="self-only">
+    The Butterworth filter is the most common general-purpose design. Its magnitude response is as flat as possible in the passband,
+    with no ripple, and falls smoothly through −3 dB at the cutoff frequency. Beyond the cutoff the gain decreases by 20n dB per decade,
+    where the order n is the number of energy-storage elements (capacitors and inductors) in an analog implementation, or the number
+    of poles in a digital one. A higher order gives a sharper transition but more phase shift and a longer delay. The same low-pass
+    prototype is transformed to make high-pass, band-pass and band-stop versions.
+  </p>
   <div class="eq"><Tex display math={'|G(\\omega)| = \\frac{1}{\\sqrt{1 + (\\omega/\\omega_c)^{2n}}}'} /> <span class="small secondary">n = order (controls the roll-off), ω<sub>c</sub> = cutoff</span></div>
   <ButterBode />
 

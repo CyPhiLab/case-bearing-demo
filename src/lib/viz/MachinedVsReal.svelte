@@ -75,10 +75,9 @@
         {/if}
       {/if}
       <p class="small secondary">
-        Same MLP, same 18 features, same test stand. Only the <i>origin</i> of the damage changed. Machined notches make clean, sharp
-        impacts. Real pitting is rough and irregular, so a model that learned "what a notch sounds like" can miss it. That's why
-        researchers warn against judging bearing diagnostics on CWRU-style data alone, and why the most valuable training data is data
-        from the failures you actually expect.
+        The MLP, the 18 features and the test stand are the same in both cases. Only the <i>origin</i> of the damage differs. Machined notches produce clean, sharp impacts. Real pitting is rough and irregular, so a model that has learned the signature of
+        a notch may not recognize it. For this reason researchers caution against evaluating bearing diagnostics on CWRU-style data
+        alone, and the most valuable training data come from the failures that are actually expected.
       </p>
     </div>
     <Confusion matrix={run.result?.confusion ?? null} title="Real-damage test set" />

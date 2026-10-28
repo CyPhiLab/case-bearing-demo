@@ -142,6 +142,12 @@
     the methods from this page run on the live signal: waveform, spectrum with harmonics, averaging and spectrogram. Suitable test
     sounds are a hum, a whistle, a sung vowel, a tap on the desk, or a note on an instrument.
   </p>
+  <dl class="defs self-only">
+    <dt>Fundamental f₀</dt><dd>The lowest frequency of a periodic sound, heard as its pitch.</dd>
+    <dt>Harmonics</dt><dd>Components at integer multiples 2f₀, 3f₀, … Their relative levels determine the timbre, the quality that distinguishes two instruments playing the same note.</dd>
+    <dt>dBFS</dt><dd>Level in decibels relative to the largest value the ADC can represent (0 dBFS). Microphone signals are not calibrated in pascals here, so all levels are relative.</dd>
+    <dt>FFT length N</dt><dd>The number of samples in each spectrum. A longer window gives finer resolution δf = f<sub>s</sub>/N but responds more slowly to changes.</dd>
+  </dl>
   <div class="privacy small self-only">Audio is analyzed in the browser only. Nothing is uploaded or stored.</div>
 
   <div class="card">

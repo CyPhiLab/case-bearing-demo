@@ -125,12 +125,11 @@
   const pct = d3.format('.0%');
 </script>
 
-<Section id="cnn" num={8} kicker="Deep learning" title="A CNN learns its own features" lecture="Neural networks: types of networks">
+<Section id="cnn" num={8} kicker="Deep learning" title="Convolutional neural network" lecture="Neural networks: types of networks">
   <p class="self-only">
-    Everything so far relied on <b>features we designed</b>. A 1D <b>convolutional neural network</b> skips that step. It reads the raw
-    2048 samples and learns its own filters. Each first-layer filter is a short pattern of 32 weights slid along the signal. Deeper layers
-    combine those patterns into more abstract ones. This network was trained offline (in PyTorch, same windows and split) and now runs live
-    in your browser.
+    The models so far used <b>hand-designed features</b>. A 1D <b>convolutional neural network</b> (CNN) omits that step: it takes the
+    raw 2048 samples as input and learns its own filters. Each first-layer filter is a short pattern of 32 weights slid along the signal. Deeper layers combine these patterns into more complex ones. The network was trained offline (in PyTorch, with the same windows and
+    split) and runs in the browser.
   </p>
 
   {#if loadError}
@@ -185,7 +184,7 @@
             </div>
           {/each}
           <p class="verdict" class:wrong={pred !== rec.clsIndex}>
-            {pred === rec.clsIndex ? '✓ Correct' : `✗ Wrong: it's really ${rec.cls}`}
+            {pred === rec.clsIndex ? '✓ Correct' : `✗ Incorrect: the true class is ${rec.cls}`}
           </p>
         </div>
       </div>
@@ -203,19 +202,18 @@
     </div>
 
     <div class="card" style="margin-top: 1rem">
-      <h3>How a convolution works, one step at a time</h3>
+      <h3>Convolution, step by step</h3>
       <p class="small secondary self-only">
-        This is the network's real first layer at work on the window above. A filter of 32 learned weights sits on 32 input samples. Multiply
-        them pairwise, add up the products and the bias, then apply ReLU. That gives <i>one</i> output value. Slide over by one sample and
-        repeat, 2017 times. Wherever the signal locally looks like the filter, the products line up in sign and the output spikes. That's
-        why the output spikes at the impacts.
+        This is the network's first layer applied to the window above. A filter of 32 learned weights sits on 32 input samples. The two are multiplied pairwise, the products and the bias are summed, and ReLU is applied. This gives <i>one</i> output
+      value. The filter then moves by one sample and the operation is repeated, 2017 times in total. Where the signal locally resembles
+      the filter, the products have the same sign and the output is large. For this reason the output peaks at the impacts.
       </p>
       <ConvAnimation {cnn} {input} fs={ds.fs} />
     </div>
 
     <div class="card" style="margin-top: 1rem">
       <div class="head">
-        <h3>What did the first layer learn?</h3>
+        <h3>First-layer filters</h3>
         <div class="seg" role="group" aria-label="Filter view">
           <button aria-pressed={filterView === 'freq'} onclick={() => (filterView = 'freq')}>Frequency response</button>
           <button aria-pressed={filterView === 'time'} onclick={() => (filterView = 'time')}>Weights (time)</button>
@@ -235,20 +233,17 @@
       </div>
       <p class="small secondary" style="margin: 0.5rem 0 0">
         {#if filterView === 'freq'}
-          Each panel runs from 0 to 6 kHz. The shaded strip is the 2–5 kHz resonance band we used for envelope analysis in section 2. Each
-          filter is a learned <b>frequency-selective filter</b>, bumpier than a textbook band-pass, and <b>{inBand} of {filters.length}</b>
-          have their strongest response inside that band (the band covers half the axis, so chance alone would give about 8). Nobody told the
-          network where the resonance was. It leaned toward that band from the data.
+          Each panel runs from 0 to 6 kHz. The shaded strip is the 2–5 kHz resonance band used for envelope analysis in section 2. Each filter is a learned <b>frequency-selective filter</b>, less regular than a textbook band-pass, and <b>{inBand} of {filters.length}</b>
+          have their strongest response inside that band (the band covers half the axis, so chance alone would give about 8). The network was not told where the resonance was; it found this band from the data.
         {:else}
-          Each filter is just 32 numbers. Convolution slides it along the signal and outputs a large value wherever the signal locally looks
-          like the filter.
+          Each filter is 32 numbers. Convolution slides it along the signal and gives a large output wherever the signal locally resembles the filter.
         {/if}
       </p>
     </div>
 
     <div class="grid-2" style="margin-top: 1rem">
       <div class="card">
-        <h3>How it trained</h3>
+        <h3>Training history</h3>
         <LineChart
           series={[
             { y: cnn.spec.history.map((h) => h.loss), xStart: 1, color: 'var(--accent)', width: 2, label: 'training loss' },
@@ -263,10 +258,9 @@
         <div style="margin-top: 0.4rem"><Confusion matrix={cnn.spec.confusion} title="Test set ({pct(cnn.spec.testAccuracy)} accuracy)" /></div>
       </div>
       <div class="card">
-        <h3>Stress test: add noise</h3>
+        <h3>Robustness to noise</h3>
         <p class="small secondary">
-          Real factories are noisy. Corrupt all {ds.recordings.length * 22} test windows with Gaussian noise and see how quickly the CNN
-          degrades.
+          Industrial measurements are often noisy. Add Gaussian noise to all {ds.recordings.length * 22} test windows and observe how the CNN's accuracy degrades.
         </p>
         <button class="primary" onclick={runSweep} disabled={sweeping}>{sweeping ? 'Testing…' : '▶ Run noise sweep'}</button>
         {#if sweep.length}
@@ -288,12 +282,11 @@
     </div>
   {/if}
 
-  <Predict question="The CNN gets ~100%, like logistic regression on our 18 features. So why bother hand-engineering features at all?">
+  <Predict question="The CNN gets ~100%, like logistic regression on the 18 features. Why, then, engineer features by hand?">
     <p>
-      Here, with clean lab data, both work. The trade-offs: the CNN needed far more training effort and data augmentation, it has
-      {cnn ? ARCH.reduce((s, b) => s + b.params, 0).toLocaleString() : '~27,000'} parameters versus 76 for logistic regression, and it's
-      much harder to explain. Engineered features carry decades of domain knowledge and generalize in ways you can reason about. CNNs shine
-      when you have lots of data and the useful patterns are hard to describe by hand.
+      With clean laboratory data, both approaches work. The trade-offs are that the CNN needed far more training effort and data augmentation, it has
+      {cnn ? ARCH.reduce((s, b) => s + b.params, 0).toLocaleString() : '~27,000'} parameters versus 76 for logistic regression, and it is much harder to interpret. Engineered features encode decades of domain knowledge, and their behavior can be
+      reasoned about. CNNs are most useful when large amounts of data are available and the relevant patterns are difficult to describe by hand.
     </p>
   </Predict>
 
@@ -303,7 +296,7 @@
       'To save memory only',
       'Because a bearing impact looks the same whenever it happens, so a pattern detector should work at any time shift',
       'Because the signal is periodic',
-      'It doesn\'t. Each position has its own weights',
+      'It does not. Each position has its own weights',
     ]}
     answer={1}
     explain="Weight sharing builds in translation invariance. An impact at 10 ms or at 150 ms is the same event. It also cuts the parameter count enormously compared with a dense layer over all 2048 samples."

@@ -30,6 +30,15 @@
   <FourierFit />
 
   <h3>Fourier series</h3>
+  <p class="self-only">
+    A periodic signal with period T can be written as a <b>Fourier series</b>: its mean value plus cosine and sine terms at the
+    fundamental frequency f₀ = 1/T and its integer multiples, the <b>harmonics</b>. Each coefficient is found by integrating the signal
+    against the corresponding cosine or sine over one period. If the signal is an odd function, y(−t) = −y(t), only sine terms remain.
+    If it is even, y(−t) = y(t), only cosine terms remain. In practice the series is truncated, and the <i>partial sum</i> of the first
+    few terms approximates the waveform. <Ref eq="2.17, 2.18" />
+  </p>
+  <div class="eq"><Tex display math={'y(t) = A_0 + \sum_{n=1}^{\infty}\left(A_n \cos n\omega t + B_n \sin n\omega t\right), \quad A_n = \frac{2}{T}\int_{-T/2}^{T/2} y(t)\cos n\omega t\,dt, \quad B_n = \frac{2}{T}\int_{-T/2}^{T/2} y(t)\sin n\omega t\,dt'} /></div>
+  <p class="self-only small secondary">The amplitude of harmonic n is C<sub>n</sub> = √(A<sub>n</sub>² + B<sub>n</sub>²), the quantity plotted in the stem chart below. <Ref eq="2.21" /></p>
   <SeriesBuilder />
 
   <Predict question="A square wave and a triangle wave have the same period. Which one needs more terms to look right, and why?">
@@ -56,6 +65,13 @@
   <BeamModes />
 
   <h3>The discrete Fourier transform <span class="muted small">(book Examples 2.6–2.7)</span></h3>
+  <p class="self-only">
+    A measured record is a finite set of N samples y(rδt), r = 0 … N−1, taken at intervals δt. The DFT converts these N samples into
+    amplitudes at N/2 discrete frequencies f<sub>k</sub> = k/(Nδt), from 0 up to the Nyquist frequency 1/(2δt). The spacing between
+    frequencies, the <b>frequency resolution</b> δf = 1/(Nδt), is the inverse of the record length. With the 2/N scaling used here, a
+    sine of amplitude C that falls exactly on a frequency f<sub>k</sub> appears as a single line of height C. The FFT is an efficient
+    algorithm for computing the DFT.
+  </p>
   <div class="eq"><Tex display math={'Y(f_k) = \\frac{2}{N}\\sum_{r=0}^{N-1} y(r\\,\\delta t)\\, e^{-i2\\pi rk/N}, \\qquad f_k = \\frac{k}{N\\,\\delta t}'} /> <Ref eq="2.38" /></div>
   <DFTTable />
 

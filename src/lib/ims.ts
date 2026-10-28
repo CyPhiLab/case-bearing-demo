@@ -4,9 +4,9 @@ import { dataUrl, decodeSignal } from './data';
 export type Indicator = 'rms' | 'kurtosis' | 'crest' | 'envBPFO';
 
 export const INDICATORS: { key: Indicator; name: string; unit: string; blurb: string }[] = [
-  { key: 'envBPFO', name: 'Envelope at BPFO', unit: 'g', blurb: 'The physics-informed one: how strongly the 2–8 kHz resonance is "rung" at the outer-race ball-pass rate.' },
+  { key: 'envBPFO', name: 'Envelope at BPFO', unit: 'g', blurb: 'Physics-based: the strength of the envelope of the 2–8 kHz resonance band at the outer-race ball-pass frequency.' },
   { key: 'rms', name: 'RMS', unit: 'g', blurb: 'Overall vibration level.' },
-  { key: 'kurtosis', name: 'Kurtosis', unit: '', blurb: 'Spikiness of the waveform (0 for Gaussian noise).' },
+  { key: 'kurtosis', name: 'Kurtosis', unit: '', blurb: 'Peakedness of the waveform (0 for Gaussian noise).' },
   { key: 'crest', name: 'Crest factor', unit: '', blurb: 'Peak ÷ RMS.' },
 ];
 

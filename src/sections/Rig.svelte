@@ -35,13 +35,20 @@
   ]);
 </script>
 
-<Section id="rig" num={1} kicker="The physics" title="A tiny pit makes a big, regular noise">
+<Section id="rig" num={1} kicker="Bearing physics" title="Bearing faults and their frequencies">
   <p class="self-only">
-    The CWRU test rig is a 2 hp motor driving a dynamometer through a torque sensor. Engineers used electro-discharge machining
-    to cut a tiny pit, 0.007 to 0.021 inches across, into the <b>drive-end bearing</b> (an {BEARING.model}). An accelerometer on
-    the motor housing then recorded what that bearing sounded like. Every time a ball rolls over the pit, it delivers a sharp
-    <b>impact</b> that rings the housing like a bell.
+    The CWRU test rig is a 2 hp motor driving a dynamometer through a torque sensor. Faults were introduced into the
+    <b>drive-end bearing</b> (an {BEARING.model}) by electro-discharge machining: a single pit, 0.007 to 0.021 in. in diameter. An
+    accelerometer on the motor housing recorded the vibration. Each time a ball rolls over the pit, it produces a short
+    <b>impact</b> that excites the structural resonances of the bearing and housing.
   </p>
+  <dl class="defs self-only">
+    <dt>Inner race</dt><dd>The inner ring, mounted on the shaft. It rotates with the shaft.</dd>
+    <dt>Outer race</dt><dd>The outer ring, mounted in the housing. It is usually stationary.</dd>
+    <dt>Rolling elements</dt><dd>The balls (or rollers) that roll between the two races and carry the load.</dd>
+    <dt>Cage</dt><dd>Keeps the rolling elements evenly spaced. It rotates at the fundamental train frequency (FTF), a little less than half the shaft speed.</dd>
+    <dt>Fault frequency</dt><dd>The rate at which a defect is struck. It depends on the defect location, the bearing geometry and the shaft speed, and is calculated below.</dd>
+  </dl>
 
   <div class="card">
     <div class="controls">
@@ -76,37 +83,36 @@
     </div>
     {#if rigIdx === 2}
       <p class="small secondary rig-note">
-        <b>A third experiment: real damage on demand.</b> At Paderborn University, engineers damaged small 6203 bearings two ways. Some
-        were damaged <i>artificially</i>, like CWRU, with EDM, drilling or an electric engraver. Others were run to <i>real</i> damage
-        (fatigue pitting) on accelerated life-test rigs. Then they recorded all of them on the same motor test stand. That lets us ask a
-        sharp question in section 9: does a model trained on machined faults recognize real ones?
+        <b>Paderborn University: artificial and real damage.</b> Small 6203 bearings were damaged in two ways. Some were damaged
+        <i>artificially</i>, as at CWRU, by EDM, drilling or an electric engraver. Others were run to <i>real</i> damage (fatigue pitting)
+        on accelerated life-test rigs. All were then recorded on the same motor test stand. This makes it possible to test, in section 9,
+        whether a model trained on machined faults recognizes real ones.
       </p>
     {/if}
     {#if rigIdx === 1}
       <p class="small secondary rig-note">
-        <b>A second, very different experiment.</b> The CWRU rig has pits <i>machined</i> into its bearings on purpose. On the NASA/IMS
-        rig (University of Cincinnati), four of these large roller bearings ran at 2000 rpm under a 6000 lb load, around the clock, until
-        one of them <i>wore out on its own</i> after about 7 days. Nobody knew in advance which bearing would fail, or how. You'll see its
-        data in sections 2, 4 and 9.
+        <b>NASA/IMS: a run-to-failure test.</b> The CWRU bearings have pits <i>machined</i> into them deliberately. On the NASA/IMS rig
+        (University of Cincinnati), four of these large roller bearings ran at 2000 rpm under a 6000 lb load, continuously, until one of them
+        <i>failed naturally</i> after about 7 days. Which bearing would fail, and how, was not known in advance. Its data are used in
+        sections 2, 4 and 9.
       </p>
     {/if}
   </div>
 
-  <Predict question="The outer race doesn't move, but the inner race spins with the shaft. Which defect do you think the balls hit more often each second?">
+  <Predict question="The outer race is stationary, while the inner race rotates with the shaft. Which defect do the balls strike more often per second?">
     <p>
-      The <b>inner race</b>. Balls roll past an inner-race pit faster because the pit is rotating toward them. At 1772 rpm that's about
+      The <b>inner race</b>. Balls roll past an inner-race pit faster because the pit is rotating toward them. At 1772 rpm this is about
       {ff.bpfi.toFixed(0)} strikes/s, versus {ff.bpfo.toFixed(0)}/s on the outer race. The inner-race pit also swings in and out
-      of the load zone once per revolution, so its impacts grow and fade. Watch the strike amplitude in the trace.
+      of the load zone once per revolution, so its impacts grow and fade. The strike amplitude in the trace shows this modulation.
     </p>
   </Predict>
 
   <div class="grid-2" style="margin-top: 1rem">
     <div class="card">
-      <h3>Every fault has its own frequency</h3>
+      <h3>Fault frequencies</h3>
       <p class="small secondary">
         From the {geom.model}'s geometry ({geom.balls} {geom.element}s, {geom.element} diameter d = {geom.ballDiameter}″, pitch diameter D =
-        {geom.pitchDiameter}″{geom.contactAngle ? `, contact angle φ = ${((geom.contactAngle * 180) / Math.PI).toFixed(2)}°` : ''}), you can
-        predict exactly how often each kind of defect gets struck.
+        {geom.pitchDiameter}″{geom.contactAngle ? `, contact angle φ = ${((geom.contactAngle * 180) / Math.PI).toFixed(2)}°` : ''}), the rate at which each type of defect is struck can be calculated.
       </p>
       <table class="ff">
         <thead><tr><th>Frequency</th><th></th><th class="r">Hz</th><th class="r">× shaft</th></tr></thead>
@@ -123,7 +129,7 @@
       </table>
     </div>
     <div class="card self-only">
-      <h3>Where these come from</h3>
+      <h3>Formulas</h3>
       <div class="eqs">
         <Tex display math={'\\text{BPFO} = \\frac{n f_r}{2}\\left(1 - \\frac{d}{D}\\cos\\phi\\right)'} />
         <Tex display math={'\\text{BPFI} = \\frac{n f_r}{2}\\left(1 + \\frac{d}{D}\\cos\\phi\\right)'} />
@@ -131,8 +137,7 @@
       </div>
       <p class="small secondary">
         Here n = number of balls, f<sub>r</sub> = shaft frequency, and φ = contact angle (0 for this deep-groove bearing). A defect on
-        a ball touches <i>both</i> races once per spin, so it shows up at 2×BSF. These are the "fingerprints" we'll look for in the real
-        data.
+        a ball touches <i>both</i> races once per spin, so it shows up at 2×BSF. These frequencies are the signatures to look for in the measured data.
       </p>
     </div>
   </div>
@@ -148,10 +153,10 @@
   </div>
 
   <Quiz
-    question="Our data is sampled at 12 kHz. Which of these could we NOT measure faithfully?"
+    question="The data are sampled at 12 kHz. Which of these could NOT be measured faithfully?"
     options={['The ~160 Hz inner-race strike rate', 'A 3 kHz structural resonance excited by each strike', 'An 8 kHz resonance', 'The 29.5 Hz shaft rotation']}
     answer={2}
-    explain="Anything above the Nyquist frequency (fs/2 = 6 kHz) aliases. It folds back and masquerades as a lower frequency. The impact rate (~100–160 Hz) and a 3 kHz resonance are both comfortably below 6 kHz."
+    explain="Anything above the Nyquist frequency (fs/2 = 6 kHz) aliases. It folds back and appears at a lower frequency. The impact rate (~100–160 Hz) and a 3 kHz resonance are both comfortably below 6 kHz."
   />
 </Section>
 

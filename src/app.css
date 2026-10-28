@@ -226,6 +226,12 @@ input[type='checkbox'] { accent-color: var(--accent); }
   gap: 1rem;
 }
 
+/* definition lists for short topic descriptions */
+.defs { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0.4rem 0 1rem; max-width: 80ch; font-size: 0.95rem; }
+.defs dt { font-weight: 600; }
+.defs dd { margin: 0; color: var(--text-secondary); }
+@media (max-width: 560px) { .defs { grid-template-columns: 1fr; } .defs dd { margin-bottom: 0.4rem; } }
+
 .chip {
   display: inline-flex;
   align-items: center;

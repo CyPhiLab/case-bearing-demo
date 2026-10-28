@@ -73,7 +73,7 @@
     margin={{ top: 4, right: 14, bottom: 18, left: 56 }}
     xFormat={(v) => `day ${v}`}
     yFormat={() => ''}
-    markers={[{ x: snap.hours / 24, color: 'var(--text-primary)', label: 'you are here' }]}
+    markers={[{ x: snap.hours / 24, color: 'var(--text-primary)', label: 'current' }]}
     hover={false}
     onpoint={(x) => {
       let best = 0;

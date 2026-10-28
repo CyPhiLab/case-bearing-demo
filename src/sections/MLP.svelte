@@ -75,16 +75,16 @@
   }
 </script>
 
-<Section id="mlp" num={7} kicker="Multilayer perceptron" title="Neural networks: bend the boundaries" lecture="Neural networks: hidden layers, ReLU, backprop">
+<Section id="mlp" num={7} kicker="Neural networks" title="Multilayer perceptron" lecture="Neural networks: hidden layers, ReLU, backprop">
   <div class="intro self-only">
     <p>
-      A <b>multilayer perceptron</b> stacks layers of "neurons." Each one computes a weighted sum of its inputs and passes it through a
+      A <b>multilayer perceptron</b> (MLP) consists of layers of "neurons." Each one computes a weighted sum of its inputs and passes it through a
       nonlinearity, the <b>activation function</b>:
     </p>
     <div class="eq"><Tex display math={'\\mathbf{h}_1 = \\mathrm{ReLU}(W_1\\mathbf{x} + \\mathbf{b}_1),\\quad \\mathbf{h}_2 = \\mathrm{ReLU}(W_2\\mathbf{h}_1 + \\mathbf{b}_2),\\quad \\hat{\\mathbf{y}} = \\mathrm{softmax}(W_3\\mathbf{h}_2 + \\mathbf{b}_3)'} /></div>
     <p>
-      Without the ReLUs, the whole stack would collapse into one big linear map, which is logistic regression again. With them, the
-      network can bend its decision boundaries. Training is the same gradient descent, with the gradients computed by
+      Without the ReLU activations, the layers would combine into a single linear map, equivalent to logistic regression. With them,
+      the network can form curved decision boundaries. Training is the same gradient descent, with the gradients computed by
       <b>backpropagation</b>.
     </p>
   </div>
@@ -112,15 +112,23 @@
 
   <Predict question="Logistic regression scored about 74% in this plane. What will a small neural network do with the same two inputs?">
     <p>
-      It should get close to 100%. Watch the colored regions bend and wrap around the outer-race islands. Same inputs, same data. The
-      only difference is the hidden layers with nonlinear activations. Try the 1 × 8 network too: even 8 ReLU neurons make a big
-      difference.
+      Close to 100%. The colored regions curve around the outer-race clusters. The inputs and data are the same; the only difference is
+      the hidden layers with nonlinear activations. A 1 × 8 network is also sufficient to make a large difference.
     </p>
   </Predict>
 
+    <dl class="defs self-only" style="margin-top: 1.2rem">
+    <dt>Training / validation / test</dt><dd>The model is fitted to the training windows. The validation windows monitor overfitting during training. The test windows are used only for the final accuracy.</dd>
+    <dt>Epoch</dt><dd>One pass through all training windows.</dd>
+    <dt>Learning rate</dt><dd>The step size of each gradient-descent update.</dd>
+    <dt>Overfitting</dt><dd>Fitting the training data, including its noise and errors, so closely that performance on new data suffers.</dd>
+    <dt>L2 regularization</dt><dd>A penalty on large weights added to the loss. It favors smoother decision boundaries.</dd>
+    <dt>Dropout</dt><dd>Randomly disabling a fraction of the neurons at each training step, so that the network cannot rely on any single one.</dd>
+  </dl>
+
   <div class="card" style="margin-top: 1rem">
     <div class="head">
-      <h3>B. Neural-network playground (all 18 features)</h3>
+      <h3>B. Network settings and training (all 18 features)</h3>
       <div class="presets">
         <button onclick={overfitPreset} title="Big network, 10% of the data, 30% of its labels wrong, many epochs">Make it overfit</button>
         <button onclick={() => (l2 = 0.03)} disabled={!labelNoise} title="Penalize large weights">Fix: add L2</button>
@@ -203,16 +211,16 @@
   <div class="self-only experiments">
     <h3>Experiments to try</h3>
     <ol>
-      <li><b>Overfitting.</b> Click <i>Make it overfit</i> and train. The setup is a big network (about 10,000 weights), only 80 training windows, and 30% of them carrying the <i>wrong</i> label: the "bad labels" problem from the Data lecture. The network memorizes the mistakes. Training accuracy climbs to ~100%, but validation loss turns around and climbs while test accuracy stalls near 75%.</li>
-      <li><b>Regularization.</b> Now click <i>Fix: add L2</i> and retrain. Training accuracy <i>drops</i> to ~70%, which is about the fraction of labels that are actually right, while test accuracy jumps to ~95%. The penalty on large weights stops the network from bending itself around every wrong label. Dropout (40–50%) has a similar effect.</li>
-      <li><b>More data.</b> <i>Fix: more data</i> uses all 810 windows (still 30% mislabeled). It's harder to memorize, so the test score improves. Combine it with L2 and it reaches ~100%. The dashed line on the loss chart marks the lowest validation loss, which is where <b>early stopping</b> would have stopped.</li>
-      <li><b>Learning rate.</b> Set it to the maximum. The loss curve gets jumpy, because the steps overshoot. Set it very low and training crawls.</li>
-      <li><b>Activations.</b> Swap ReLU for sigmoid with 3 layers. Training is noticeably slower, which shows the vanishing-gradient issue in miniature.</li>
+      <li><b>Overfitting.</b> Click <i>Make it overfit</i> and train. The setup is a big network (about 10,000 weights), only 80 training windows, and 30% of them carrying the <i>wrong</i> label: the "bad labels" problem from the Data lecture. The network memorizes the incorrect labels. Training accuracy climbs to ~100%, but validation loss turns around and climbs while test accuracy stalls near 75%.</li>
+      <li><b>Regularization.</b> Now click <i>Fix: add L2</i> and retrain. Training accuracy <i>drops</i> to ~70%, which is about the fraction of labels that are actually right, while test accuracy jumps to ~95%. The penalty on large weights prevents the network from fitting every incorrect label. Dropout (40–50%) has a similar effect.</li>
+      <li><b>More data.</b> <i>Fix: more data</i> uses all 810 windows (still 30% mislabeled). The larger set is harder to memorize, so the test accuracy improves. Combine it with L2 and it reaches ~100%. The dashed line on the loss chart marks the lowest validation loss, which is where <b>early stopping</b> would have stopped.</li>
+      <li><b>Learning rate.</b> Set it to the maximum. The loss curve becomes erratic because the steps overshoot. At a very low rate, training is very slow.</li>
+      <li><b>Activations.</b> Swap ReLU for sigmoid with 3 layers. Training is noticeably slower, an example of the vanishing-gradient problem.</li>
     </ol>
   </div>
 
   <Quiz
-    question="With all 18 features, both logistic regression and the MLP hit ~100% here. When does the extra power of an MLP actually pay off?"
+    question="With all 18 features, both logistic regression and the MLP hit ~100% here. When is the additional flexibility of an MLP useful?"
     options={[
       'Always: neural networks are strictly better',
       'When the classes are not (close to) linearly separable in the features you give it, like the PCA plane',
@@ -220,7 +228,7 @@
       'Only when using the sigmoid activation',
     ]}
     answer={1}
-    explain="If straight boundaries already work, the MLP can't do better. It just costs more parameters and is harder to interpret. Its advantage shows up when the boundary needs to curve, as in part A."
+    explain="If straight boundaries already work, the MLP cannot do better; it only adds parameters and is harder to interpret. Its advantage appears when the boundary must be curved, as in part A."
   />
 </Section>
 

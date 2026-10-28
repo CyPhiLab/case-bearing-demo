@@ -76,6 +76,13 @@
     <b>dynamic</b> signal varies in time. It can be <b>deterministic</b> (periodic, or a predictable step, ramp or pulse) or
     <b>nondeterministic</b> (random, describable only by its statistics). Signal processing deals almost entirely with dynamic signals. <Ref sec="2.2" /> <Ref fig="2.5" />
   </p>
+  <dl class="defs self-only">
+    <dt>Static</dt><dd>Constant over the measurement time: y(t) = A₀. Examples are a shaft diameter or a dead weight on a load cell.</dd>
+    <dt>Simple periodic</dt><dd>A single sinusoid that repeats with period T = 1/f. It is described by its mean A₀, amplitude C, frequency f and phase φ.</dd>
+    <dt>Complex periodic</dt><dd>A sum of sinusoids at integer multiples (harmonics) of a fundamental frequency. It still repeats with the fundamental period.</dd>
+    <dt>Aperiodic</dt><dd>Deterministic but not repeating: a <i>step</i> (a sudden change, such as a switch closing), a <i>ramp</i> (a change at a constant rate up to t<sub>f</sub>) or a <i>pulse</i> (a step followed by a return after t₁). Steps and ramps are standard test inputs for measurement systems.</dd>
+    <dt>Nondeterministic</dt><dd>Random: no two records are the same, and future values cannot be predicted exactly. The signal is described by statistics such as its mean, RMS value and spectrum.</dd>
+  </dl>
 
   <div class="layout">
     <div class="card list" role="listbox" aria-label="Waveform classes">

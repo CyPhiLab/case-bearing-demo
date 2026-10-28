@@ -14,15 +14,15 @@
   import Diagnose from './sections/Diagnose.svelte';
 
   const SECTIONS = [
-    { id: 'rig', label: 'The bearing' },
-    { id: 'signal', label: 'Look & listen' },
+    { id: 'rig', label: 'Bearing' },
+    { id: 'signal', label: 'Signals' },
     { id: 'windows', label: 'Windows' },
     { id: 'features', label: 'Features' },
     { id: 'pca', label: 'PCA' },
     { id: 'logistic', label: 'Logistic reg.' },
-    { id: 'mlp', label: 'Neural net' },
+    { id: 'mlp', label: 'MLP' },
     { id: 'cnn', label: 'CNN' },
-    { id: 'diagnose', label: 'Diagnose' },
+    { id: 'diagnose', label: 'Diagnosis' },
   ];
 
   let dataset = $state<Dataset | null>(null);

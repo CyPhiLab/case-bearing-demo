@@ -65,11 +65,11 @@
   }
 </script>
 
-<Section id="windows" num={3} kicker="From one recording to many examples" title="Slice the signal into windows" lecture="Data: how much data?">
+<Section id="windows" num={3} kicker="Data preparation" title="Windowing the recordings" lecture="Data: how much data?">
   <p class="self-only">
-    A classifier needs <i>many</i> labelled examples, but we only have 10 recordings. The fix is to cut each recording into short
-    <b>windows</b> and treat every window as one example. Each window inherits its recording's label. Overlapping the windows squeezes
-    out even more examples.
+    A classifier needs <i>many</i> labelled examples, but there are only 10 recordings. Each recording is therefore divided into
+    short <b>windows</b>, and every window is treated as one example with the label of its recording. Overlapping the windows increases
+    the number of examples further, although overlapping examples are not fully independent.
   </p>
 
   <div class="card">
@@ -147,11 +147,11 @@
         ariaLabel="Selected window"
       />
       <p class="small secondary" style="margin: 0.3rem 0 0">
-        This window holds <b>{frame}</b> numbers. In the next section we'll boil them down to 18.
+        This window contains <b>{frame}</b> samples. The next section reduces them to 18 features.
       </p>
     </div>
     <div class="card">
-      <h3>Choosing the window size is a measurement trade-off</h3>
+      <h3>Choice of window size</h3>
       <table class="tradeoff">
         <tbody>
           <tr><td>Duration</td><td class="num">{((frame / fs) * 1000).toFixed(1)} ms</td></tr>
@@ -162,17 +162,16 @@
         </tbody>
       </table>
       <p class="small secondary self-only">
-        Too short, and a window might miss the impacts entirely. Its spectrum is also blurry, because Δf is large. Too long, and you get
-        fewer examples to learn from. The course notebook used <b>2048 samples with 50% overlap</b>, about 5 shaft revolutions and
-        roughly 18 outer-race impacts per window, and so do the rest of this page and its models.
+        A window that is too short may contain few or no impacts, and its spectrum has coarse resolution because Δf is large. A window
+        that is too long gives fewer examples to learn from. The course notebook used <b>2048 samples with 50% overlap</b>, about 5 shaft revolutions and
+        roughly 18 outer-race impacts per window, as do the rest of this page and its models.
       </p>
     </div>
   </div>
 
-  <Predict question="With 2048-sample windows and 50% overlap, about how many examples does one 10 s recording give us?">
+  <Predict question="With 2048-sample windows and 50% overlap, about how many examples does one 10 s recording give?">
     <p>
-      The hop between windows is 1024 samples, so roughly 120,000 / 1024 ≈ 117. We get a few less (113) because windows aren't allowed
-      to cross the train/validation/test boundaries. Across all 10 recordings that's 1,130 examples, of which 113 are healthy and 339 per
+      The hop between windows is 1024 samples, so roughly 120,000 / 1024 ≈ 117. The actual number is slightly lower (113) because windows may not cross the train/validation/test boundaries. Across all 10 recordings this gives 1,130 examples, of which 113 are healthy and 339 per
       fault type.
     </p>
   </Predict>

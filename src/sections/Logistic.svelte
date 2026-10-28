@@ -34,15 +34,15 @@
   });
 </script>
 
-<Section id="logistic" num={6} kicker="Linear baseline" title="Logistic regression: straight-line boundaries" lecture="Regression: logistic regression & log loss">
+<Section id="logistic" num={6} kicker="Linear baseline" title="Logistic regression" lecture="Regression: logistic regression & log loss">
   <div class="intro self-only">
     <p>
-      Logistic regression computes a weighted sum of the features and squashes it into a probability. Your lecture used the sigmoid
-      for yes/no. With four classes we use its big sibling, <b>softmax</b>, with one weight vector per class:
+      Logistic regression computes a weighted sum of the features and maps it to a probability. The lecture used the sigmoid function
+      for two classes. For four classes its generalization, the <b>softmax</b> function, is used, with one weight vector per class:
     </p>
     <div class="eq"><Tex display math={'P(\\text{class } k \\mid \\mathbf{x}) = \\frac{e^{\\mathbf{w}_k\\cdot\\mathbf{x} + b_k}}{\\sum_j e^{\\mathbf{w}_j\\cdot\\mathbf{x} + b_j}}'} /></div>
     <p>
-      Training minimizes the <b>log loss</b> with gradient descent (Adam), just like in lecture. Because the score
+      Training minimizes the <b>log loss</b> with gradient descent (Adam), as in the lecture. Because the score
       <Tex math={'\\mathbf{w}_k\\cdot\\mathbf{x}+b_k'} /> is linear, the boundary between any two classes is a <b>straight line</b>
       (a hyperplane in more dimensions).
     </p>
@@ -65,10 +65,10 @@
     <BoundaryLab {space} config={config2d} resultKey="lr2d" />
   </div>
 
-  <Predict question="Before you press Train: can straight lines cleanly carve this plane into the four classes?">
+  <Predict question="Before training: can straight lines separate the four classes in this plane?">
     <p>
-      Not quite. Look at the outer-race windows (squares). They sit in two separate islands at opposite corners, with other classes in
-      between. A linear model can only give each class one convex region, so one of the islands gets misclassified. Expect roughly 70–80%
+      Not quite. Look at the outer-race windows (squares). They lie in two separate clusters at opposite corners, with other classes in between. A linear model can give each class only one
+      convex region, so one of the clusters is misclassified. Expect roughly 70–80%
       accuracy.
     </p>
   </Predict>
@@ -85,7 +85,7 @@
         {#if full.weights}
           <CoefHeatmap weights={full.weights[0]} names={FEATURES.map((f) => f.name)} />
         {:else}
-          <p class="muted small">Train the model to see its weights. There's one weight per (feature, class) pair: 18 × 4 = 72, plus 4 biases.</p>
+          <p class="muted small">Train the model to display its weights. There's one weight per (feature, class) pair: 18 × 4 = 72, plus 4 biases.</p>
         {/if}
       </div>
     </div>
@@ -93,9 +93,9 @@
 
   <div class="self-only" style="margin-top: 1rem">
     <p>
-      With all 18 features, the classes become (almost) <b>linearly separable</b>: in 18 dimensions there's room for flat boundaries
-      between them. Squeezing to 2D threw that room away. That's the big strength of logistic regression: it's fast, it's hard to overfit,
-      and the weights are readable. You can see, for example, which features push a window toward "Outer Race."
+      With all 18 features, the classes are (almost) <b>linearly separable</b>: in 18 dimensions, flat boundaries can separate them.
+      Projecting to 2D discards this. Logistic regression is fast, resistant to overfitting, and its weights are interpretable. For
+      example, the weights show which features move a window toward "Outer Race."
     </p>
   </div>
 
