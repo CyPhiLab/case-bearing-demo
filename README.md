@@ -40,13 +40,13 @@ as a supplement through small "F&B Eq./Fig./Example" tags.
 | 2 | Static and dynamic | Generate every waveform class of Table 2.1 with live parameters, then play "classify the signal" | 3–4 |
 | 3 | Noise and interference | Add random noise, drift and 60 Hz hum to y = 2 + sin 2πt and see the time trace and the spectrum | 5 |
 | 4 | Mean and RMS | Move the DC offset, amplitude and N, and watch ȳ, y_rms and y_rms² = ȳ² + σ² update (Ex. 2.1) | 6 |
-| 5 | Fourier review | Fit a Fourier model to data (least squares, R²), build a square/sawtooth/triangle/rectified wave from sines (Ex. 2.4–2.5, Gibbs), find a spring–mass natural frequency, step through the 8-point DFT (Ex. 2.6–2.7), and explore leakage, windowing and zero-padding | 7 |
+| 5 | Fourier review | Fit a Fourier model to data (least squares, R²), build a square/sawtooth/triangle/rectified wave from sines (Ex. 2.4–2.5, Gibbs), find a spring–mass natural frequency and the first four modes of a cantilever beam (impact and sensor position, mode nodes), step through the 8-point DFT (Ex. 2.6–2.7), and explore leakage, windowing and zero-padding | 7 |
 | 6 | Sampling | Sweep a sine past f_s/2 (with the spectral-image strip), **hear aliasing** on a sweep with and without an anti-aliasing filter, and quantize with 1–16 bits (SNR ≈ 6.02N + 1.76 dB) | 8 |
 | 7 | Filters | Analog vs digital, LP/HP/BP/BS, SMA vs EMA (lag, √M noise reduction), Butterworth \|G\| for n = 1–8, and a **filter lab** on any clip with presets (remove 60 Hz hum), causal vs zero-phase, and listening | 9–12 |
 | 8 | Convolution | Slide a kernel along a signal step by step (MA, EMA, matched filter, derivative) with its frequency response | – |
 | 9 | Averaging, SNR & dB | dB converter, ensemble averaging (√N), Welch vs a single FFT | – |
-| 10 | Mic lab | **Live microphone**: waveform, spectrum, f₀ and harmonics (clarinet vs brass, Ex. 2.8), averaging, scrolling spectrogram, and recording clips into the other labs. Simulated sources are available without a mic | – |
-| 11 | Phone lab | **Phone accelerometer** (DeviceMotion, iOS permission): measured sample rate and jitter, resampling, RMS, spectrum, CSV download. A QR code is shown on desktop, plus a simulated fan recording with an aliased tone | – |
+| 10 | Microphone | **Live microphone**: waveform, spectrum, f₀ and harmonics (clarinet vs brass, Ex. 2.8), averaging, scrolling spectrogram, and recording clips into the other labs. Simulated sources are available without a mic | – |
+| 11 | Accelerometer | **Phone accelerometer** (DeviceMotion, iOS permission): measured sample rate and jitter, resampling, RMS, spectrum, CSV download. A QR code is shown on desktop, plus a simulated fan recording with an aliased tone | – |
 
 The filters are a SciPy-compatible Butterworth implementation (`butter(..., output='sos')`, `sosfilt`, `sosfiltfilt`), checked
 against SciPy to 6–7 decimal places in `tests/filters.test.ts`. Microphone and motion data are processed only in the browser.

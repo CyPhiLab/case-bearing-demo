@@ -43,7 +43,7 @@ test('mic lab: listens to a (fake) microphone and records a clip for the filter 
   await expect(page.locator('[data-testid=mic-status]')).toContainText('Listening', { timeout: 10_000 });
   await page.locator('[data-testid=mic-record]').click();
   await expect(page.locator('#mic')).toContainText('Saved as', { timeout: 10_000 });
-  await expect(page.locator('[data-testid=filter-lab] select option', { hasText: 'Your recording #1' })).toHaveCount(1);
+  await expect(page.locator('[data-testid=filter-lab] select option', { hasText: 'Recording #1' })).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 

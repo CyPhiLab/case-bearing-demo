@@ -24,12 +24,12 @@
   const err = $derived(measured.map((v, i) => v - clean[i]));
 </script>
 
-<Section id="noise" num={3} kicker="What else gets measured" title="Noise and interference">
+<Section id="noise" num={3} kicker="Measurement errors" title="Noise and interference">
   <p class="self-only">
-    Real measurements contain more than the signal you want. <b>Noise</b> is random: thermal noise in resistors, electronic noise in the
-    amplifier, turbulence. It's spread across all frequencies and changes every time you measure. <b>Interference</b> is an unwanted signal
+    A measurement contains more than the signal of interest. <b>Noise</b> is random: thermal noise in resistors, electronic noise in the
+    amplifier, turbulence. It is spread across all frequencies and differs from one measurement to the next. <b>Interference</b> is an unwanted signal
     that is <i>not</i> random, but comes from another source: 60 Hz mains hum picked up by a cable, a slow thermal drift, a nearby
-    motor. Both corrupt the measurement, but you fight them differently.
+    motor. Both corrupt the measurement, but they are reduced in different ways.
   </p>
 
   <div class="card">
@@ -74,19 +74,19 @@
         <div class="stat"><span class="value num">{mean(measured).toFixed(3)} V</span><span class="label">mean of the measurement (signal: 2.000)</span></div>
         <div class="stat"><span class="value num">{rms(err).toFixed(3)} V</span><span class="label">RMS error vs the true signal</span></div>
         <p class="small secondary">
-          <b>Noise</b> lifts the whole floor of the spectrum. A fresh measurement gives a different trace with the same statistics.
-          <b>Interference</b> shows up as specific features: a sharp line at 60 Hz, or the drift piling up near 0 Hz. It's identical every
-          time you measure.
+          <b>Noise</b> raises the whole floor of the spectrum. A fresh measurement gives a different trace with the same statistics.
+          <b>Interference</b> shows up as specific features: a sharp line at 60 Hz, or the drift piling up near 0 Hz. It is the same in every
+          measurement.
         </p>
       </div>
     </div>
   </div>
 
-  <Predict question="You average 100 repeated measurements. Which problem shrinks: the noise, the 60 Hz hum, or both?">
+  <Predict question="After averaging 100 repeated measurements, which is reduced: the noise, the 60 Hz hum, or both?">
     <p>
-      Only the <b>noise</b>. Random errors average toward zero, falling by √100 = 10× (section 9 shows this). The hum is phase-locked to
-      the power grid, so if your measurements are triggered the same way it's identical every time and survives averaging. Interference
-      has to be removed at its source (shielding, grounding, twisted-pair cables) or with a <b>filter</b> aimed at its frequency (section 7).
+      Only the <b>noise</b>. Random errors average toward zero, decreasing by √100 = 10× (see section 9). The hum is locked to the
+      power grid, so if the measurements are triggered in the same way it is identical in each one and is not reduced by averaging.
+      Interference must be removed at the source (shielding, grounding, twisted-pair cables) or with a <b>filter</b> at its frequency (section 7).
     </p>
   </Predict>
 </Section>

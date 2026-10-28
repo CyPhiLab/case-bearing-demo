@@ -10,10 +10,10 @@
   import FilterLab from '../viz/FilterLab.svelte';
 </script>
 
-<Section id="filters" num={7} kicker="Filters" title="Filters: keep what you want, remove what you don't">
+<Section id="filters" num={7} kicker="Signal conditioning" title="Filters">
   <p class="self-only">
-    A filter removes unwanted frequency content, such as high-frequency noise, slow drift, or a 60 Hz hum, and passes the rest.
-    Filters come in two forms:
+    A filter removes unwanted frequency content, such as high-frequency noise, slow drift or 60 Hz hum, and passes the rest.
+    Filters are either analog or digital:
   </p>
   <div class="ad">
     <div class="card">
@@ -26,7 +26,7 @@
       </svg>
       <b>Analog</b>
       <p class="small secondary">
-        Resistors, capacitors and op-amps acting on the voltage <i>before</i> it is digitized. This one RC circuit is a first-order
+        Resistors, capacitors and op-amps acting on the voltage <i>before</i> it is digitized. A single RC stage is a first-order
         (n = 1) Butterworth low-pass with f<sub>c</sub> = 1/(2πRC). Only an analog filter can prevent aliasing, because it acts before
         sampling.
       </p>
@@ -37,31 +37,31 @@
          - a1*y[n-1] - a2*y[n-2]</pre>
       <b>Digital</b>
       <p class="small secondary">
-        Arithmetic on the samples <i>after</i> the ADC. It's exactly repeatable and easy to change, and offline it can even run
-        backwards to cancel lag (zero-phase). Every filter on this page is digital, a few lines of code like these.
+        Arithmetic on the samples <i>after</i> the ADC. It is exactly repeatable and easy to change, and offline it can be run
+        forwards and backwards to cancel the lag (zero-phase). All filters on this page are digital.
       </p>
     </div>
   </div>
 
-  <h3>Classifications</h3>
+  <h3>Filter classifications</h3>
   <p class="self-only">
-    Filters are named by what they <b>pass</b>. The <b>cutoff frequency</b> f<sub>c</sub> marks the edge of the passband. The
+    Filters are named by the band they <b>pass</b>. The <b>cutoff frequency</b> f<sub>c</sub> marks the edge of the passband. The
     <b>roll-off</b> is how fast the gain falls beyond it.
   </p>
   <FilterTypes />
 
-  <h3>The simplest filter: a moving average</h3>
+  <h3>Moving-average filters</h3>
   <p class="self-only">
-    Replace each sample with the average of the last M samples. Random noise partly cancels out, while slow changes survive: a
-    low-pass filter. The exponential version weights recent samples more heavily. <Ref fig="2.22" />
+    Each sample is replaced by the average of the last M samples. Random noise partly cancels, while slow variations are preserved, so
+    the moving average is a low-pass filter. The exponential version weights recent samples more heavily. <Ref fig="2.22" />
   </p>
   <MovingAvg />
 
   <Predict question="You double the moving-average window M. What happens to the noise, the lag and the first null frequency?">
     <p>
-      The noise drops by about another √2, the lag doubles (to about (M−1)/2 samples), and the first null moves down to half the
-      frequency, f<sub>s</sub>/M. A moving average gives you one knob, and it trades smoothing directly against lag and lost detail.
-      A Butterworth filter lets you choose the cutoff and the steepness separately.
+      The noise decreases by a further factor of about √2, the lag doubles (it is about (M−1)/2 samples), and the first null moves to
+      half the frequency, f<sub>s</sub>/M. A moving average has a single parameter, which trades smoothing against lag and loss of
+      detail. A Butterworth filter allows the cutoff and the steepness to be chosen separately.
     </p>
   </Predict>
 
@@ -71,9 +71,9 @@
 
   <h3 id="filter-lab">Filter lab</h3>
   <p class="self-only">
-    Run any signal on the page through any filter: the slide 5 signal, the hum example, the sweep, or something you recorded in
-    the microphone or phone labs. The blue curve is the filter's gain, drawn over the signal's spectrum. Wherever it dips, that
-    part of the spectrum is removed.
+    Any signal on the page can be filtered here: the slide 5 signal, the hum example, the sweep, or a recording from the microphone
+    or phone labs. The blue curve is the filter gain, drawn over the signal spectrum. Where the gain is low, that part of the spectrum
+    is attenuated.
   </p>
   <FilterLab />
 
@@ -81,7 +81,7 @@
     question="You need to remove 60 Hz hum from a strain-gauge signal whose useful content runs from 0 to 200 Hz. Which filter do you choose?"
     options={['A low-pass at 50 Hz', 'A high-pass at 70 Hz', 'A narrow band-stop (notch) around 60 Hz', 'A moving average with M = fs/60']}
     answer={2}
-    explain="Your signal overlaps 60 Hz on both sides, so a low-pass or high-pass would remove real content. A narrow band-stop takes out only the hum. (A moving average with M = fs/60 does put a null at 60 Hz, but it also rolls off everything above a few Hz.)"
+    explain="The signal content extends on both sides of 60 Hz, so a low-pass or high-pass filter would remove part of it. A narrow band-stop takes out only the hum. (A moving average with M = fs/60 does put a null at 60 Hz, but it also rolls off everything above a few Hz.)"
   />
 </Section>
 

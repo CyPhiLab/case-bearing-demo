@@ -70,13 +70,13 @@
     </div>
   </div>
   <p class="small secondary">
-    Y(f_k) = (2/N) Σ y(rδt) e<sup>−i2πrk/N</sup>, with C(f_k) = |Y(f_k)|. Frequencies come in steps of δf = 1/(Nδt) =
+    Y(f_k) = (2/N) Σ y(rδt) e<sup>−i2πrk/N</sup>, with C(f_k) = |Y(f_k)|. Frequencies are spaced by δf = 1/(Nδt) =
     <b class="num">{df.toFixed(3)} Hz</b>, up to the Nyquist frequency 1/(2δt) = <b class="num">{(1 / (2 * dt)).toFixed(2)} Hz</b>.
     {#if Math.abs(f / df - Math.round(f / df)) < 1e-6}
-      f sits exactly on a bin, so all {A} V lands in one line.
+      f falls exactly on a bin, so the full {A} V appears in one line.
     {:else}
-      f = {f.toFixed(2)} Hz falls <i>between</i> bins ({(f / df).toFixed(2)} δf), so the amplitude smears into its neighbors. That's
-      <b>leakage</b>, covered next.
+      f = {f.toFixed(2)} Hz falls <i>between</i> bins ({(f / df).toFixed(2)} δf), so the amplitude spreads into neighboring bins. This is
+      <b>leakage</b>, discussed next.
     {/if}
   </p>
 </div>

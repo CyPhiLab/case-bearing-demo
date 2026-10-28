@@ -36,10 +36,10 @@
   const rTrue = $derived(rms(yDense));
 </script>
 
-<Section id="rms" num={4} kicker="Describing a dynamic signal" title="The mean hides the action. RMS doesn't.">
+<Section id="rms" num={4} kicker="Signal statistics" title="Mean and RMS values">
   <p class="self-only">
-    The <b>mean</b> (average, or DC offset) describes the static part of a signal. It tells you nothing about how much the signal
-    <i>moves</i>. A sine averages to zero over a full period, yet it clearly carries energy. For the dynamic (AC) content we use the
+    The <b>mean</b> (average, or DC offset) describes the static part of a signal. It says nothing about how much the signal
+    <i>varies</i>. A sine averages to zero over a full period, yet it carries energy. For the dynamic (AC) content we use the
     <b>root-mean-square</b>, which comes straight from power: a current I(t) dissipates the same energy in a resistor as a constant
     current I<sub>rms</sub>. <Ref sec="2.3" />
   </p>
@@ -100,17 +100,16 @@
   </div>
 
   <p class="self-only small secondary">
-    Try it: set the DC offset to 0. The mean goes to ≈0, but the RMS stays at C/√2 ≈ {(amp / Math.SQRT2).toFixed(3)} for a sine. Switch to
-    "Impulsive" with the same amplitude, and the RMS drops a lot, even though the peaks are just as high. That's why vibration analysts
-    also track the <i>crest factor</i>, peak ÷ RMS. With few samples (small N), both estimates wander. That's the discrete approximation at
-    work.
+    Set the DC offset to 0. The mean goes to ≈0, but the RMS stays at C/√2 ≈ {(amp / Math.SQRT2).toFixed(3)} for a sine. With the "Impulsive" waveform at the same amplitude, the RMS is much lower although the peaks are equally high. For this reason
+    vibration analysts also track the <i>crest factor</i>, peak ÷ RMS. With few samples (small N), both estimates vary: this is the error of the
+    discrete approximation.
   </p>
 
   <Quiz
     question="Book Example 2.1: a current I(t) = 10 sin t is averaged over 0 to 2π. What are its mean and its RMS?"
     options={['0 A and 0 A', '0 A and √50 ≈ 7.07 A', '20/π A and √50 A', '10 A and 10 A']}
     answer={1}
-    explain="The positive and negative halves cancel in the mean, but squaring makes both halves count: I_rms = 10/√2 = √50 A over 0–π or 0–2π alike. The resistor heats up the same in both half-cycles."
+    explain="The positive and negative halves cancel in the mean, but squaring makes both halves count: I_rms = 10/√2 = √50 A over 0–π or 0–2π alike. The resistor dissipates the same energy in both half-cycles."
   />
 </Section>
 

@@ -66,13 +66,13 @@
   </div>
   <p class="small secondary">
     {#if factor === 1}
-      Choose a lower sample rate. The sweep rises steadily to 6 kHz.
+      Select a lower sample rate. The original sweep rises steadily to 6 kHz.
     {:else if !aa}
-      Above the new Nyquist line, the sweep doesn't disappear. It <b>folds back down</b>, so you hear the pitch rise, fall and rise
-      again. Once it's sampled, you can't tell those aliased tones from real ones.
+      Above the new Nyquist frequency the sweep does not disappear; it <b>folds back</b>, so the pitch rises, falls and rises
+      again. After sampling, the aliased tones cannot be distinguished from real ones.
     {:else}
       With an anti-aliasing filter applied <i>before</i> sampling, everything above the new f<sub>N</sub> is removed, so the sweep
-      fades out instead of folding back. That's why every DAQ and sound card has an analog low-pass in front of its ADC.
+      fades out instead of folding back. For this reason DAQ systems and sound cards place an analog low-pass filter before the ADC.
     {/if}
   </p>
 </div>

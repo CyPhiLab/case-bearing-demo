@@ -37,7 +37,7 @@
     try {
       src = await startMic();
     } catch (e) {
-      error = (e as Error).name === 'NotAllowedError' ? 'Microphone permission was denied. You can still use a simulated source.' : `Couldn't open a microphone (${(e as Error).message}). Try a simulated source.`;
+      error = (e as Error).name === 'NotAllowedError' ? 'Microphone permission was denied. A simulated source can be used instead.' : `Couldn't open a microphone (${(e as Error).message}). Use a simulated source instead.`;
     }
   }
   function useDemo() {
@@ -122,7 +122,7 @@
         const x = Float64Array.from(s.ring.latest(2 * s.ring.fs));
         recCount++;
         const id = `mic-${recCount}`;
-        addClip({ id, name: `Your recording #${recCount} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })})`, fs: s.ring.fs, x, units: 'full scale', recorded: true });
+        addClip({ id, name: `Recording #${recCount} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })})`, fs: s.ring.fs, x, units: 'full scale', recorded: true });
         lastRec = id;
       }
     }, 50);
@@ -136,17 +136,17 @@
   const fmtF = (f: number) => (f >= 1000 ? `${(f / 1000).toFixed(2)} kHz` : `${f.toFixed(1)} Hz`);
 </script>
 
-<Section id="mic" num={10} kicker="Live lab" title="Your microphone is a measurement system">
+<Section id="mic" num={10} kicker="Live lab" title="Microphone measurements">
   <p class="self-only">
-    Your laptop's microphone is a transducer, its sound card an ADC sampling at {fs.toLocaleString()} Hz. Turn it on and everything
-    from this page runs live: a waveform, a spectrum with its harmonics, averaging, and a spectrogram. Hum, whistle, sing a vowel, tap
-    the desk, or play a note on an instrument.
+    A laptop microphone is a transducer, and the sound card is an ADC sampling at {fs.toLocaleString()} Hz. With the microphone on,
+    the methods from this page run on the live signal: waveform, spectrum with harmonics, averaging and spectrogram. Suitable test
+    sounds are a hum, a whistle, a sung vowel, a tap on the desk, or a note on an instrument.
   </p>
-  <div class="privacy small self-only">🔒 The sound is analyzed in your browser and never leaves this page. Nothing is uploaded or stored.</div>
+  <div class="privacy small self-only">Audio is analyzed in the browser only. Nothing is uploaded or stored.</div>
 
   <div class="card">
     <div class="controls">
-      <button class="primary" onclick={useMic} data-testid="mic-start">🎤 Use my microphone</button>
+      <button class="primary" onclick={useMic} data-testid="mic-start">Start microphone</button>
       <span class="small muted">or</span>
       <select bind:value={demo} aria-label="Simulated source">{#each DEMOS as d}<option value={d.value}>{d.label}</option>{/each}</select>
       <button onclick={useDemo}>Use simulated sound</button>
@@ -157,7 +157,7 @@
     {#if src}
       <p class="small secondary" data-testid="mic-status">Listening: <b>{src.label}</b>, f<sub>s</sub> = {fs} Hz, f<sub>N</sub> = {fs / 2} Hz</p>
     {:else}
-      <p class="small muted">Not listening. Press a button above. Your browser will ask for permission before using the microphone.</p>
+      <p class="small muted">Not running. The browser asks for permission before using the microphone.</p>
     {/if}
 
     <div class="cols">
@@ -191,7 +191,7 @@
     />
     <div class="cols">
       <div>
-        <b class="small">Harmonics relative to f₀</b>
+        <b class="small">Harmonic levels relative to f₀</b>
         <StemChart
           stems={harm.map((p) => ({ x: p.k, y: Math.max(-60, p.db), color: p.k % 2 ? 'var(--cls-2)' : 'var(--cls-3)' }))}
           xDomain={[0.5, 8.5]}
@@ -208,17 +208,17 @@
           The odd harmonics are {oddEven > 0 ? 'stronger' : 'weaker'} than the even ones by <b class="num">{Math.abs(oddEven).toFixed(0)} dB</b>.
           {oddEven > 12 ? 'Mostly odd harmonics: a clarinet-like (closed-pipe) sound.' : 'Even and odd harmonics both present: brass-, voice- or string-like.'}
         {/if}
-        Book Example 2.8: a clarinet's spectrum has mostly <b>odd</b> harmonics (a pipe closed at one end), while brass instruments show all of them. The harmonic mix is what makes two
-        instruments playing the same note sound different (their <i>timbre</i>).
+        Book Example 2.8: a clarinet's spectrum has mostly <b>odd</b> harmonics (a pipe closed at one end), while brass instruments show all of them. The relative harmonic levels determine the
+        <i>timbre</i>, which distinguishes instruments playing the same note.
       </p>
     </div>
   </div>
 
-  <h3>Spectrogram: frequency over time</h3>
+  <h3>Spectrogram</h3>
   <p class="self-only">
-    A spectrogram stacks short spectra side by side: time runs left to right, frequency up, color is level. It's the
-    short-time Fourier transform (STFT). The window length sets a trade-off: short windows track fast changes but blur frequency,
-    and long windows resolve frequency sharply but smear time. Try it with a whistle that slides up and down.
+    A spectrogram displays successive short spectra side by side, with time on the horizontal axis, frequency on the vertical axis
+    and level as color. It is computed with the short-time Fourier transform (STFT). The window length sets a trade-off: short
+    windows follow fast changes but have coarse frequency resolution, and long windows resolve frequency finely but blur changes in time. A whistle that changes pitch shows the effect clearly.
   </p>
   <div class="card">
     <div class="controls">
@@ -228,23 +228,23 @@
     <ScrollingSpectrogram ring={src?.ring ?? null} nfft={specN} fmax={Math.min(fmax, fs / 2)} {floorDb} height={app.mode === 'lecture' ? 300 : 240} />
   </div>
 
-  <h3>Keep a recording</h3>
+  <h3>Recording a clip</h3>
   <div class="card rec">
-    <button onclick={record} disabled={!src || recording > 0} data-testid="mic-record">{recording ? `Recording… ${(recording * 2).toFixed(1)} s` : '⏺ Record 2 s'}</button>
+    <button onclick={record} disabled={!src || recording > 0} data-testid="mic-record">{recording ? `Recording… ${(recording * 2).toFixed(1)} s` : 'Record 2 s'}</button>
     {#if lastRec}
       <span class="small">Saved as “{clips.find((c) => c.id === lastRec)?.name}”.</span>
-      <button onclick={() => send('filter')}>Filter it (section 7) →</button>
-      <button onclick={() => send('alias')}>Alias it (section 6) →</button>
+      <button onclick={() => send('filter')}>Open in filter lab (section 7)</button>
+      <button onclick={() => send('alias')}>Open in aliasing demo (section 6)</button>
     {:else}
-      <span class="small muted">Recordings stay in this tab and show up in the filter lab and the aliasing demo.</span>
+      <span class="small muted">Recordings remain in this tab and are available in the filter lab and the aliasing demo.</span>
     {/if}
   </div>
 
   <Predict question="Sing a steady 'aaa' and then 'eee' on the same note. What stays the same in the spectrum, and what changes?">
     <p>
-      The <b>harmonic spacing</b> stays the same, since f₀ is your pitch and the harmonics sit at exact multiples of it. What changes is
-      which harmonics are loud. Your vocal tract acts as a <i>filter</i> with resonances (formants). "aaa" boosts harmonics around
-      700–1200 Hz, and "eee" boosts a band near 2–3 kHz. Same source, different filter. That's section 7, in your throat.
+      The <b>harmonic spacing</b> stays the same, since f₀ is the sung pitch and the harmonics are at exact multiples of it. What changes is
+      the relative level of the harmonics. The vocal tract acts as a <i>filter</i> with resonances (formants): "aaa" emphasizes harmonics
+      around 700–1200 Hz, and "eee" a band near 2–3 kHz. The source is the same; the filter differs.
     </p>
   </Predict>
 </Section>

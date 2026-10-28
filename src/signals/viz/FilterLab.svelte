@@ -158,7 +158,7 @@
       />
     </div>
     <div class="peaks">
-      <b class="small">What happened to each line</b>
+      <b class="small">Change in each spectral line</b>
       {#if peaks.length}
         <table class="num" data-testid="peak-table">
           <thead><tr><th>line</th><th>change</th></tr></thead>
@@ -167,12 +167,12 @@
           </tbody>
         </table>
       {:else}
-        <p class="small muted">No clear lines in this signal.</p>
+        <p class="small muted">No distinct spectral lines in this signal.</p>
       {/if}
       {#if clip.note}<p class="small muted">{clip.note}</p>{/if}
       <p class="small secondary">
-        {#if zeroPhase}Zero-phase runs the filter forward, then backward: no lag, but it needs the whole record (offline only), and the magnitude is applied twice.
-        {:else}A causal filter only uses past samples, so it can run in real time. Its output is delayed (look at the edges).{/if}
+        {#if zeroPhase}A zero-phase filter is applied forwards and then backwards. There is no lag, but the whole record is required (offline only), and the magnitude response is applied twice.
+        {:else}A causal filter uses only past samples, so it can run in real time. Its output is delayed, which is visible at the edges.{/if}
       </p>
     </div>
   </div>

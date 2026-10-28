@@ -47,10 +47,10 @@
       : [{ x: f1, label: 'f_1', color: 'var(--cls-2)', dash: true }, { x: f2, label: 'f_2', color: 'var(--cls-2)', dash: true }],
   );
   const DESC: Record<FilterType, string> = {
-    lowpass: 'Keeps slow content, removes fast content: smoothing noise, anti-aliasing before an ADC.',
-    highpass: 'Removes slow content: drift, DC offset, gravity in an accelerometer signal.',
-    bandpass: 'Keeps one band: isolating a gear-mesh frequency or one radio station.',
-    bandstop: 'Removes one band (a notch when narrow): 60 Hz mains hum.',
+    lowpass: 'Passes low frequencies and attenuates high frequencies. Used for noise smoothing and anti-aliasing before an ADC.',
+    highpass: 'Attenuates low frequencies. Used to remove drift, DC offset, or gravity from an accelerometer signal.',
+    bandpass: 'Passes one band. Used to isolate a gear-mesh frequency or a radio channel.',
+    bandstop: 'Attenuates one band (a notch filter when narrow). Used to remove 60 Hz mains hum.',
   };
 </script>
 
@@ -76,7 +76,7 @@
     {markers}
     ariaLabel="Filter magnitude response"
   />
-  <p class="small secondary"><span class="key dash"></span> ideal "brick wall" &nbsp; <span class="key"></span> real Butterworth filter, order {n}<br /><b>{type[0].toUpperCase() + type.slice(1, -4)}-{type.slice(-4)}:</b> {DESC[type]} The real filter can't jump from pass to stop. The steepness of that transition is the <b>roll-off</b>.</p>
+  <p class="small secondary"><span class="key dash"></span> ideal "brick wall" &nbsp; <span class="key"></span> real Butterworth filter, order {n}<br /><b>{type[0].toUpperCase() + type.slice(1, -4)}-{type.slice(-4)}:</b> {DESC[type]} A real filter cannot change abruptly from passband to stopband; the steepness of the transition is the <b>roll-off</b>.</p>
 </div>
 
 <style>

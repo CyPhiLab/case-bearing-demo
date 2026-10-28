@@ -68,9 +68,9 @@
     />
   </div>
   <p class="small secondary">
-    Averaging works because the noise is <b>random</b> while the response is <b>synchronized</b> to the trigger. It's the same in every
-    record. Doubling N buys only 3 dB, so the returns diminish quickly. Interference that is <i>also</i> locked to the trigger is never
-    averaged away.
+    Averaging works because the noise is <b>random</b> while the response is <b>synchronized</b> to the trigger and identical in every
+    record. Doubling N improves the SNR by only 3 dB, so the returns diminish quickly. Interference that is also synchronized to the
+    trigger is not reduced by averaging.
   </p>
 </div>
 

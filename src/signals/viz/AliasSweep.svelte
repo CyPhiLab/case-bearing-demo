@@ -53,7 +53,7 @@
   <LineChart
     series={[
       { y: truth, dx: T / 1000, color: 'var(--text-muted)', width: 1.2, label: `true signal, ${f.toFixed(2)} Hz` },
-      ...(aliased ? [{ y: alias, dx: T / 1000, color: 'var(--cls-2)', width: 2.5, dash: [7, 4], label: `what the samples show, ${fa.toFixed(2)} Hz` }] : []),
+      ...(aliased ? [{ y: alias, dx: T / 1000, color: 'var(--cls-2)', width: 2.5, dash: [7, 4], label: `apparent signal, ${fa.toFixed(2)} Hz` }] : []),
     ]}
     xDomain={[0, T]}
     yDomain={[-1.25, 1.25]}
@@ -73,7 +73,7 @@
   <div class="bottom">
     <svg viewBox="0 0 {SW} {SH}" class="strip" role="img" aria-label="Spectrum with sampling images">
       <rect x={sx(0)} y="16" width={sx(fs / 2) - sx(0)} height="44" class="base" />
-      <text x={(sx(0) + sx(fs / 2)) / 2} y="12" text-anchor="middle" class="t muted">what you can see: 0 to f_N</text>
+      <text x={(sx(0) + sx(fs / 2)) / 2} y="12" text-anchor="middle" class="t muted">observable range: 0 to f_N</text>
       <line x1={sx(0)} x2={sx(2 * fs)} y1="60" y2="60" class="axis" />
       {#each [0, 0.5, 1, 1.5, 2] as k}
         <line x1={sx(k * fs)} x2={sx(k * fs)} y1="60" y2="65" class="axis" />
@@ -92,14 +92,14 @@
       <div class="small">
         f<sub>s</sub> / f = <b class="num">{f > 0 ? ratio.toFixed(1) : '∞'}</b>
         {#if !aliased && ratio >= 10}<span class="ok">✓ meets the 10× rule of thumb</span>
-        {:else if !aliased}<span class="warn">no aliasing (f &lt; f<sub>s</sub>/2), but under 10×: the shape is poorly sampled</span>
+        {:else if !aliased}<span class="warn">no aliasing (f &lt; f<sub>s</sub>/2), but below 10×: the waveform shape is poorly resolved</span>
         {:else}<span class="badtxt">✗ above the Nyquist frequency: aliased</span>{/if}
       </div>
     </div>
   </div>
   <p class="small secondary self-only">
-    Gray lines in the strip are the copies that sampling creates at k·f<sub>s</sub> ± f. All the samples can ever tell you is the one
-    copy that falls between 0 and f<sub>N</sub> = f<sub>s</sub>/2 (orange). Above f<sub>N</sub> the apparent frequency folds back down:
+    The gray lines in the strip are the images that sampling creates at k·f<sub>s</sub> ± f. The samples identify only the image
+    between 0 and f<sub>N</sub> = f<sub>s</sub>/2 (orange). Above f<sub>N</sub> the apparent frequency folds back:
     f<sub>a</sub> = |f − k·f<sub>s</sub>|.
   </p>
 </div>

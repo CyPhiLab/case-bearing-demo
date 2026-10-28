@@ -29,7 +29,7 @@
 
   async function start() {
     status = '';
-    if (!motionSupported()) { status = 'This browser has no motion sensor API. Try a phone, or use the simulated recording.'; return; }
+    if (!motionSupported()) { status = 'This browser has no motion sensor API. Use a phone, or the simulated recording.'; return; }
     const ok = await requestMotionPermission();
     if (!ok) { status = 'Motion access was denied. On iPhone: Settings → Safari → Motion & Orientation Access.'; return; }
     recorder = new MotionRecorder();
@@ -41,7 +41,7 @@
       liveCount = recorder!.count;
       if (elapsed > 1.5 && liveCount === 0) {
         finish();
-        status = 'No motion events arrived. This device may have no accelerometer, or the page needs to be opened over https.';
+        status = 'No motion events were received. The device may have no accelerometer, or the page must be opened over https.';
         return;
       }
       if (elapsed >= duration) finish();
@@ -103,7 +103,7 @@
     if (!rec) return;
     sent++;
     const id = `phone-${sent}`;
-    addClip({ id, name: `Your phone, ${axis === 'mag' ? '|a|' : axis + '-axis'} #${sent}${rec.simulated ? ' (simulated)' : ''}`, fs: fsU, x: Float64Array.from(sig), units: 'm/s²', recorded: true });
+    addClip({ id, name: `Phone, ${axis === 'mag' ? '|a|' : axis + '-axis'} #${sent}${rec.simulated ? ' (simulated)' : ''}`, fs: fsU, x: Float64Array.from(sig), units: 'm/s²', recorded: true });
     request.filter = id;
     document.getElementById('filter-lab')?.scrollIntoView({ behavior: 'smooth' });
   }
@@ -118,33 +118,32 @@
   const h = $derived(app.mode === 'lecture' ? 260 : 210);
 </script>
 
-<Section id="phone" num={11} kicker="Live lab" title="Your phone is an accelerometer">
+<Section id="phone" num={11} kicker="Live lab" title="Smartphone accelerometer">
   <p class="self-only">
-    Every smartphone has a MEMS accelerometer, a tiny proof mass on silicon springs. The browser can read it. Record some vibration,
-    then analyze it like an engineer: what is the actual sample rate (it isn't constant), what is the Nyquist frequency, what's the RMS,
-    and which frequencies show up? Try the phone lying on a running washing machine, a fan's housing, a car dashboard, or held in your
-    hand while you walk.
+    Smartphones contain a MEMS accelerometer, a small proof mass on silicon springs, which the browser can read. After recording a
+    vibration, determine the actual sample rate (it is not constant), the Nyquist frequency, the RMS level and the frequency content.
+    Suitable sources are a running washing machine, a fan housing, a car dashboard, or walking with the phone in hand.
   </p>
 
   <div class="layout" class:mobile>
     {#if !mobile}
       <div class="card qr">
-        <b>Open this lab on your phone</b>
+        <b>Open this lab on a phone</b>
         <div class="code" aria-label="QR code linking to this lab">{@html qr}</div>
         <span class="small muted url">{url}</span>
-        <span class="small secondary">The phone's browser asks for permission to use the motion sensors. Nothing is uploaded.</span>
+        <span class="small secondary">The browser asks for permission to use the motion sensors. Nothing is uploaded.</span>
       </div>
     {/if}
     <div class="card">
       <div class="controls">
         <Seg bind:value={duration} label="Record length" options={[5, 10, 20].map((v) => ({ value: v, label: `${v} s` }))} />
-        <button class="primary" onclick={start} disabled={!!timer} data-testid="phone-start">{timer ? `Recording… ${elapsed.toFixed(1)} s (${liveCount} samples)` : '⏺ Record accelerometer'}</button>
+        <button class="primary" onclick={start} disabled={!!timer} data-testid="phone-start">{timer ? `Recording… ${elapsed.toFixed(1)} s (${liveCount} samples)` : 'Record accelerometer'}</button>
         <button onclick={simulate} data-testid="phone-sim">Use a simulated recording</button>
       </div>
       {#if timer}<div class="bar"><div style:width="{(elapsed / duration) * 100}%"></div></div>{/if}
       {#if status}<p class="small err" role="alert">{status}</p>{/if}
       {#if !rec}
-        <p class="small muted">{mobile ? 'Put the phone on something that vibrates, then press record.' : 'On a laptop there is usually no accelerometer. Scan the code, or try the simulated recording (a phone on a table next to a fan).'}</p>
+        <p class="small muted">{mobile ? 'Place the phone on a vibrating surface, then start recording.' : 'Laptops usually have no accelerometer. Scan the code with a phone, or use the simulated recording (a phone on a table next to a fan).'}</p>
       {/if}
     </div>
   </div>
@@ -160,8 +159,8 @@
       <div class="controls" style="margin-top: 0.6rem">
         <Seg bind:value={axis} label="Axis" options={[{ value: 'x', label: 'x' }, { value: 'y', label: 'y' }, { value: 'z', label: 'z' }, { value: 'mag', label: '|a|' }]} />
         <Seg bind:value={detrend} label="Remove gravity" options={[{ value: 'on', label: 'remove mean (gravity)' }, { value: 'off', label: 'raw' }]} />
-        <button onclick={download}>⬇ Download CSV</button>
-        <button onclick={toClip}>Filter it (section 7) →</button>
+        <button onclick={download}>Download CSV</button>
+        <button onclick={toClip}>Open in filter lab (section 7)</button>
       </div>
       <LineChart series={[{ y: sig, dx: 1 / fsU, color: 'var(--accent)', width: 1.2 }]} height={h} xLabel={`t (s), resampled to a uniform ${fsU} Hz`} yLabel="acceleration (m/s²)" ariaLabel="Acceleration time history" />
       <div class="grid-2">
@@ -180,20 +179,20 @@
           {/if}
         </div>
         <div>
-          <b class="small">Time between samples: not quite constant</b>
+          <b class="small">Distribution of sample intervals</b>
           <StemChart stems={hist} xDomain={[hist.length ? Math.min(...hist.map((b) => b.x)) - 0.5 : 0, hist.length ? Math.max(...hist.map((b) => b.x)) + 0.5 : 1]} height={h - 20} xLabel="δt (ms)" yLabel="count" ariaLabel="Sample interval histogram" />
         </div>
       </div>
       {#if rec.simulated}
         <p class="small secondary">
           Simulated: a phone sampling at about 100 Hz on a table next to a fan, with a 20 Hz shaft imbalance and a 60 Hz blade-pass tone.
-          Where did the 60 Hz go? It's above f<sub>N</sub> ≈ 50 Hz, so it aliased to |60 − 100| = <b>40 Hz</b>. Phones have no
-          anti-aliasing filter worth the name, so keep that in mind when you trust a phone spectrum.
+          The 60 Hz tone is above f<sub>N</sub> ≈ 50 Hz, so it appears aliased at |60 − 100| = <b>40 Hz</b>. Phone accelerometers
+          generally lack an effective anti-aliasing filter, which limits how far a phone spectrum can be trusted.
         </p>
       {:else}
         <p class="small secondary">
-          Your phone delivered samples at about {fsMeas.toFixed(0)} Hz, so anything above {(fsMeas / 2).toFixed(0)} Hz is either
-          gone or aliased into the range shown. The spectrum peak at {peakF.toFixed(1)} Hz is {peakF * 60 > 100 ? `${(peakF * 60).toFixed(0)} rpm if it comes from something rotating` : 'very slow, like walking or swaying'}.
+          The phone delivered samples at about {fsMeas.toFixed(0)} Hz, so content above {(fsMeas / 2).toFixed(0)} Hz is either
+          lost or aliased into the range shown. The spectrum peak at {peakF.toFixed(1)} Hz is {peakF * 60 > 100 ? `${(peakF * 60).toFixed(0)} rpm if it comes from something rotating` : 'a low frequency, typical of walking or swaying'}.
         </p>
       {/if}
     </div>
