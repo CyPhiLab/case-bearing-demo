@@ -25,6 +25,7 @@ test('every section renders without errors', async ({ page }) => {
   for (const id of ['rig', 'signal', 'windows', 'features', 'pca', 'logistic', 'mlp', 'cnn', 'diagnose'])
     await expect(page.locator(`#${id} h2`)).toBeVisible();
   await expect(page.locator('#cnn .prow')).toHaveCount(4, { timeout: 30_000 });
+  await expect(page.locator('.katex-error')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

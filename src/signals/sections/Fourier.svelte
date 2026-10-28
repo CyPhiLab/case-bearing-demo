@@ -37,7 +37,8 @@
     If it is even, y(−t) = y(t), only cosine terms remain. In practice the series is truncated, and the <i>partial sum</i> of the first
     few terms approximates the waveform. <Ref eq="2.17, 2.18" />
   </p>
-  <div class="eq"><Tex display math={'y(t) = A_0 + \sum_{n=1}^{\infty}\left(A_n \cos n\omega t + B_n \sin n\omega t\right), \quad A_n = \frac{2}{T}\int_{-T/2}^{T/2} y(t)\cos n\omega t\,dt, \quad B_n = \frac{2}{T}\int_{-T/2}^{T/2} y(t)\sin n\omega t\,dt'} /></div>
+  <div class="eq"><Tex display math={'y(t) = A_0 + \\sum_{n=1}^{\\infty}\\left(A_n \\cos n\\omega t + B_n \\sin n\\omega t\\right)'} /></div>
+  <div class="eq"><Tex display math={'A_0 = \\frac{1}{T}\\int_{-T/2}^{T/2} y(t)\\,dt, \\qquad A_n = \\frac{2}{T}\\int_{-T/2}^{T/2} y(t)\\cos n\\omega t\\,dt, \\qquad B_n = \\frac{2}{T}\\int_{-T/2}^{T/2} y(t)\\sin n\\omega t\\,dt'} /></div>
   <p class="self-only small secondary">The amplitude of harmonic n is C<sub>n</sub> = √(A<sub>n</sub>² + B<sub>n</sub>²), the quantity plotted in the stem chart below. <Ref eq="2.21" /></p>
   <SeriesBuilder />
 
