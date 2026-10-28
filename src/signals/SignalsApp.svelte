@@ -16,7 +16,7 @@
 
   const SECTIONS = [
     { id: 'signal', label: 'What is a signal' },
-    { id: 'classes', label: 'Waveforms' },
+    { id: 'classes', label: 'Signal types' },
     { id: 'noise', label: 'Noise' },
     { id: 'rms', label: 'Mean & RMS' },
     { id: 'fourier', label: 'Fourier' },
@@ -24,8 +24,8 @@
     { id: 'filters', label: 'Filters' },
     { id: 'convolution', label: 'Convolution' },
     { id: 'averaging', label: 'Averaging' },
-    { id: 'mic', label: 'Mic lab' },
-    { id: 'phone', label: 'Phone lab' },
+    { id: 'mic', label: 'Microphone' },
+    { id: 'phone', label: 'Accelerometer' },
   ];
 
   let active = $state('');

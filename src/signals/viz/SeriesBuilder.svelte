@@ -87,16 +87,16 @@
     </div>
     <p class="small secondary">
       {#if kind === 'square'}
-        Book Example 2.4 is this wave with A = 5 and T = 2π. Only <b>odd</b> harmonics, falling like 1/n. The sharp corners need infinitely many terms. Near each jump the sum overshoots by
-        <b class="num">{overshoot!.toFixed(1)}%</b> of the jump, and that overshoot never goes away (it heads to ≈9%, the <i>Gibbs phenomenon</i>). It
-        just squeezes closer to the jump.
+        Book Example 2.4 is this wave with A = 5 and T = 2π. Only <b>odd</b> harmonics are present, decreasing as 1/n. The discontinuities require infinitely many terms. Near each jump the partial sum overshoots by
+        <b class="num">{overshoot!.toFixed(1)}%</b> of the jump. The overshoot does not vanish as terms are added (it tends to ≈9%, the <i>Gibbs phenomenon</i>);
+        it only narrows toward the jump.
       {:else if kind === 'triangle'}
-        Odd harmonics again, but falling like 1/n². No jumps, so a handful of terms already looks right.
+        Odd harmonics only, decreasing as 1/n². The wave has no discontinuities, so a few terms give a close approximation.
       {:else if kind === 'sawtooth'}
-        <b>Every</b> harmonic shows up, falling like 1/n. One jump per period gives the same Gibbs overshoot as the square wave.
+        <b>All</b> harmonics are present, decreasing as 1/n. The discontinuity in each period produces the same Gibbs overshoot as in the square wave.
       {:else}
-        Book Example 2.5: a full-wave rectified 60 Hz line (|120 sin 120πt| V). It has a big DC term, 2A/π ≈ {(240 / Math.PI).toFixed(1)} V for A = 120 V, and only
-        <b>even</b> multiples of the original 60 Hz (120, 240, … Hz). That's why a rectifier's ripple sits at 120 Hz.
+        Book Example 2.5: a full-wave rectified 60 Hz line (|120 sin 120πt| V). It has a large DC term, 2A/π ≈ {(240 / Math.PI).toFixed(1)} V for A = 120 V, and only
+        <b>even</b> multiples of the original 60 Hz (120, 240, … Hz). For this reason the ripple of a full-wave rectifier is at 120 Hz.
       {/if}
     </p>
   </div>

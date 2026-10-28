@@ -78,8 +78,8 @@
       <div class="stat"><span class="value num">{theory.toFixed(1)} dB</span><span class="label">theory for a full-scale sine, shifted by the signal level</span></div>
       <div class="small"><Tex math={'\\text{SNR} \\approx 6.02N + 1.76\\ \\text{dB}'} /></div>
       <p class="small secondary">
-        The error never exceeds ±LSB/2. Each extra bit halves it (+6 dB). A quiet signal in a big input range only uses a few of the codes. At
-        −40 dB, a 16-bit ADC is effectively a 9-bit one. Match the DAQ range to your signal.
+        The error never exceeds ±LSB/2, and each additional bit halves it (+6 dB). A small signal in a large input range uses only a few
+        codes: at −40 dB, a 16-bit ADC performs like a 9-bit one. The DAQ input range should be matched to the signal.
       </p>
     </div>
   </div>

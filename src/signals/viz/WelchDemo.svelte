@@ -58,9 +58,9 @@
     <div class="stat"><span class="value num">{peak.toFixed(1)} dB</span><span class="label">Welch peak (true {Math.max(...trueDb).toFixed(1)} dB)</span></div>
   </div>
   <p class="small secondary">
-    Random vibration of a structure with a resonance near 120 Hz. One long FFT has fine resolution, but every bin is a single random
-    sample, so it scatters by about ±5.6 dB however long you record. Welch averages away the scatter. The price is resolution: with
-    64-sample segments (δf ≈ 16 Hz) the resonance is smeared, and its peak reads too low.
+    Random vibration of a structure with a resonance near 120 Hz. A single long FFT has fine resolution, but each bin is a single random
+    estimate, so it scatters by about ±5.6 dB regardless of record length. Welch averaging reduces the scatter at the cost of
+    resolution: with 64-sample segments (δf ≈ 16 Hz) the resonance is broadened and its peak is underestimated.
   </p>
 </div>
 

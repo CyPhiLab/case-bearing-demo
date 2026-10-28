@@ -72,10 +72,10 @@
     />
   </div>
   <p class="small secondary">
-    <b>Pros:</b> trivial to compute, and it does reduce noise (by about √M for the SMA). <b>Cons:</b> it also rounds off the step and flattens the
-    0.6 Hz wiggle after t = 8 s (lost high-frequency content), and the output <b>lags</b> the truth. The EMA reacts faster at first
-    but has a long tail. Its response never reaches zero. The SMA's response has nulls at multiples of f<sub>s</sub>/M, plus
-    "sidelobes" that let some high frequencies through.
+    <b>Pros:</b> simple to compute, and it reduces noise (by about √M for the SMA). <b>Cons:</b> it also rounds off the step and attenuates
+    the 0.6 Hz oscillation after t = 8 s (loss of high-frequency content), and the output <b>lags</b> the true signal. The EMA responds
+    faster initially but has a long tail, and its frequency response never reaches zero. The SMA response has nulls at multiples of
+    f<sub>s</sub>/M, with sidelobes that pass some high-frequency content.
   </p>
 </div>
 

@@ -61,7 +61,7 @@
     <Seg bind:value={kind} label="Kernel h" options={(Object.keys(LBL) as K[]).map((k) => ({ value: k, label: LBL[k] }))} />
     {#if kind === 'ma' || kind === 'ema'}<label class="control"><span>M <b>{M}</b></span><input type="range" min="2" max="20" step="1" bind:value={M} /></label>{/if}
     <label class="control"><span>Output sample n <b>{n}</b></span><input type="range" min="0" max={N - 1} step="1" bind:value={n} /></label>
-    <button class="primary" onclick={toggle}>{timer ? '■ Pause' : '▶ Slide the kernel'}</button>
+    <button class="primary" onclick={toggle}>{timer ? '■ Pause' : '▶ Animate'}</button>
   </div>
   <div class="host" bind:clientWidth={width}>
     <svg {width} height={3 * rowH + 2 * gap + 24} role="img" aria-label="Convolution, step by step">
@@ -127,10 +127,10 @@
     />
   </div>
   <p class="small secondary">
-    {#if kind === 'ma'}All taps equal 1/M: this <i>is</i> the moving average from section 7. Its frequency response is the low-pass you saw there.
-    {:else if kind === 'ema'}Exponentially decaying taps: the EMA is a convolution too (with an infinitely long kernel, cut off here).
-    {:else if kind === 'match'}The kernel is a time-reversed copy of the burst hidden at n = 50–61. The output is largest where the input <i>looks like</i> the kernel: a <b>matched filter</b>, a band-pass centered on the burst's frequency.
-    {:else}[1, −1] gives x[n] − x[n−1], a discrete derivative. It's large at the step and suppresses slow content: a high-pass filter and an edge detector.{/if}
+    {#if kind === 'ma'}All taps equal 1/M: this is the moving average from section 7, with the same low-pass frequency response.
+    {:else if kind === 'ema'}Exponentially decaying taps: the EMA is also a convolution, with an infinitely long kernel (truncated here).
+    {:else if kind === 'match'}The kernel is a time-reversed copy of the burst at n = 50–61. The output is largest where the input resembles the kernel. This is a <b>matched filter</b>, a band-pass filter centered on the burst frequency.
+    {:else}[1, −1] gives x[n] − x[n−1], a discrete derivative. The output is large at the step and small for slowly varying content: a high-pass filter and an edge detector.{/if}
   </p>
 </div>
 

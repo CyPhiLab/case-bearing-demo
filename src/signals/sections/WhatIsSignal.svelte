@@ -8,7 +8,7 @@
   type Stage = { name: string; what: string; glyph: 'wave' | 'box' | 'volts' | 'dots' | 'radio' | 'display' };
   const CHAINS: Record<string, { title: string; stages: Stage[] }> = {
     phone: {
-      title: 'A phone call (the slide)',
+      title: 'Phone call (slide 2)',
       stages: [
         { name: 'Voice', what: 'Air pressure fluctuations: the physical signal', glyph: 'wave' },
         { name: 'Microphone', what: 'Transducer: pressure → voltage', glyph: 'box' },
@@ -19,14 +19,14 @@
       ],
     },
     laptop: {
-      title: 'Your laptop, right now',
+      title: 'Laptop microphone',
       stages: [
-        { name: 'Room sound', what: 'Pressure variations (you can measure them in section 10)', glyph: 'wave' },
+        { name: 'Room sound', what: 'Pressure variations (measured in section 10)', glyph: 'wave' },
         { name: 'MEMS microphone', what: 'Transducer: a tiny diaphragm changes a capacitance', glyph: 'box' },
         { name: 'Analog voltage', what: 'Continuous in time and in amplitude', glyph: 'volts' },
         { name: 'Sound card ADC', what: 'Samples ~48,000 times per second, 16–24 bits', glyph: 'dots' },
         { name: 'Browser', what: 'Numbers y_i, one every δt = 1/48,000 s', glyph: 'dots' },
-        { name: 'Your screen', what: 'Waveform, spectrum, spectrogram', glyph: 'display' },
+        { name: 'Display', what: 'Waveform, spectrum, spectrogram', glyph: 'display' },
       ],
     },
     machine: {
@@ -47,7 +47,7 @@
         { name: 'Thermistor', what: 'Transducer: resistance changes with temperature', glyph: 'box' },
         { name: 'Bridge voltage', what: 'A small voltage proportional to ΔR', glyph: 'volts' },
         { name: 'ADC', what: 'One sample per second is plenty', glyph: 'dots' },
-        { name: 'Wi-Fi', what: 'Sent to your phone app', glyph: 'radio' },
+        { name: 'Wi-Fi', what: 'Sent to a phone app', glyph: 'radio' },
         { name: 'Display', what: '21.4 °C', glyph: 'display' },
       ],
     },
@@ -89,8 +89,8 @@
   </blockquote>
   <p class="self-only">
     In measurements, the variation is a physical quantity (pressure, acceleration, temperature) that a <b>transducer</b> turns into an
-    <b>electronic signal</b>. Then it gets processed, maybe transmitted, and finally displayed or turned back into something we sense. The
-    chain looks the same whatever you measure.
+    <b>electronic signal</b>. It is then processed, possibly transmitted, and finally displayed or converted back into a physical quantity. The
+    same chain applies whatever the measured quantity.
   </p>
 
   <div class="card">
@@ -128,11 +128,11 @@
   </div>
 
   <div class="apps self-only">
-    <b>Signals are everywhere:</b>
+    <b>Applications:</b>
     <span class="chip">Image processing: an image is a 2-D signal</span>
     <span class="chip">Biology: ECG, EEG, neural spikes</span>
     <span class="chip">Seismography: ground motion</span>
-    <span class="chip">Measurements: every sensor you'll ever use</span>
+    <span class="chip">Measurements: every sensor</span>
   </div>
 
   <Quiz

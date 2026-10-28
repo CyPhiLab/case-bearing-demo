@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Spectral leakage: the DFT assumes the record repeats. A tone that doesn't fit a whole number of cycles leaks.
+  // Spectral leakage: the DFT assumes the record repeats, so a tone without a whole number of cycles leaks.
   import LineChart from '../../lib/charts/LineChart.svelte';
   import Seg from '../../lib/ui/Seg.svelte';
   import { dftAmplitude, linspace } from '../../lib/dsp/signals';
@@ -36,7 +36,7 @@
   </div>
   <div class="grid-2">
     <div>
-      <b class="small">What the DFT assumes: the record repeats forever</b>
+      <b class="small">Periodic extension assumed by the DFT</b>
       <LineChart
         series={[{ y: repeated, dx: 1 / fs, color: 'var(--accent)', width: 1.5 }]}
         xDomain={[0, (3 * N) / fs]}
@@ -44,19 +44,19 @@
         height={app.mode === 'lecture' ? 220 : 180}
         xLabel="t (s)"
         yLabel="y"
-        bands={[{ x0: N / fs, x1: (2 * N) / fs, fill: 'color-mix(in srgb, var(--accent) 8%, transparent)', label: 'your record' }]}
+        bands={[{ x0: N / fs, x1: (2 * N) / fs, fill: 'color-mix(in srgb, var(--accent) 8%, transparent)', label: 'record' }]}
         markers={[{ x: N / fs, color: 'var(--critical)', dash: true }, { x: (2 * N) / fs, color: 'var(--critical)', dash: true }]}
         hover={false}
         ariaLabel="Periodic extension of the record"
       />
       <p class="small secondary">
         {#if win === 'rect' && Math.abs(bins - Math.round(bins)) > 0.02}
-          A whole number of cycles doesn't fit, so there's a <b>jump at every seam</b> (red lines). A jump needs many frequencies to
-          build, so energy leaks across the whole spectrum.
+          The record does not contain a whole number of cycles, so there is a <b>discontinuity at each joint</b> (red lines). A
+          discontinuity contains many frequencies, so energy leaks across the spectrum.
         {:else if win === 'hann'}
-          The Hann window tapers both ends to zero, so the seams join smoothly whatever f is. The cost is a wider main peak.
+          The Hann window tapers both ends to zero, so the joints are continuous for any f. The cost is a wider main peak.
         {:else}
-          An exact whole number of cycles, so the seams join smoothly and there's no leakage.
+          The record contains a whole number of cycles, so the joints are continuous and there is no leakage.
         {/if}
       </p>
     </div>

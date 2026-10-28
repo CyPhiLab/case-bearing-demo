@@ -12,19 +12,13 @@
   let k = $state(4000); // N/m
   let m = $state(0.5); // kg
   let zeta = $state(0.02);
-  let second = $state(false);
   const fn = $derived(Math.sqrt(k / m) / (2 * Math.PI));
   const x = $derived(
     t.map((tt) => {
       if (tt < t0) return 0;
       const s = tt - t0;
       const wn = 2 * Math.PI * fn;
-      let v = Math.exp(-zeta * wn * s) * Math.sin(wn * Math.sqrt(1 - zeta * zeta) * s);
-      if (second) {
-        const w2 = 2.76 * wn; // second bending mode of a free–free beam sits at 2.76 f1
-        v += 0.5 * Math.exp(-zeta * w2 * s) * Math.sin(w2 * s);
-      }
-      return v;
+      return Math.exp(-zeta * wn * s) * Math.sin(wn * Math.sqrt(1 - zeta * zeta) * s);
     }),
   );
   const spec = $derived(dftAmplitude(x, 1 / fs));
@@ -73,8 +67,7 @@
         <label class="control"><span>Stiffness k <b>{k.toFixed(0)} N/m</b></span><input type="range" min="100" max="20000" step="100" bind:value={k} /></label>
         <label class="control"><span>Mass m <b>{m.toFixed(2)} kg</b></span><input type="range" min="0.05" max="2" step="0.05" bind:value={m} /></label>
         <label class="control"><span>Damping ζ <b>{zeta.toFixed(3)}</b></span><input type="range" min="0.002" max="0.2" step="0.002" bind:value={zeta} /></label>
-        <label class="check"><input type="checkbox" bind:checked={second} /> add a second mode (a beam, not a point mass)</label>
-        <button class="primary" onclick={strike}>🔨 Strike it</button>
+        <button class="primary" onclick={strike}>Strike</button>
       </div>
       <LineChart
         series={[{ y: x, dx: 1 / fs, color: 'var(--accent)', width: 1.2 }]}
@@ -87,7 +80,7 @@
       />
       <LineChart
         series={[{ x: spec.freq, y: spec.amp, color: 'var(--accent)', width: 1.5, fill: true }]}
-        xDomain={[0, Math.min(fs / 2, Math.max(60, (second ? 3.4 : 2) * fn))]}
+        xDomain={[0, Math.min(fs / 2, Math.max(60, 2 * fn))]}
         height={app.mode === 'lecture' ? 200 : 160}
         xLabel="frequency (Hz)"
         yLabel="amplitude"
@@ -96,8 +89,8 @@
       />
       <p class="small secondary">
         Spectrum peak at <b class="num">{peak.toFixed(1)} Hz</b>; theory says <b class="num">{fn.toFixed(1)} Hz</b> (resolution δf = {(fs / N).toFixed(2)} Hz).
-        More damping gives a wider peak. Stiffen the spring and the peak moves up; add mass and it moves down. That's how
-        impact-hammer tests find a structure's natural frequencies.
+        Increasing the damping widens the peak. Increasing k raises the natural frequency and increasing m lowers it. Impact-hammer
+        tests use the same principle to identify the natural frequencies of a structure.
       </p>
     </div>
   </div>
@@ -113,6 +106,5 @@
   .mass { fill: var(--accent); }
   .mlabel { fill: #fff; font-weight: 700; font-size: 14px; }
   .klabel { fill: var(--text-secondary); font-style: italic; font-size: 13px; }
-  .check { display: flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; color: var(--text-secondary); }
   @media (max-width: 640px) { .layout { grid-template-columns: 1fr; } .rig { height: 140px; margin: 0 auto; display: block; } }
 </style>

@@ -72,10 +72,9 @@
 
 <Section id="classes" num={2} kicker="Signal types" title="Static and dynamic signals">
   <p class="self-only">
-    A <b>static</b> signal doesn't change during the time you care about, like the diameter of a shaft or a battery voltage over a minute. A
+    A <b>static</b> signal does not change over the time of interest, like the diameter of a shaft or a battery voltage over a minute. A
     <b>dynamic</b> signal varies in time. It can be <b>deterministic</b> (periodic, or a predictable step, ramp or pulse) or
-    <b>nondeterministic</b> (random, describable only by its statistics). In practice, signal processing is almost all about dynamic
-    signals. <Ref sec="2.2" /> <Ref fig="2.5" />
+    <b>nondeterministic</b> (random, describable only by its statistics). Signal processing deals almost entirely with dynamic signals. <Ref sec="2.2" /> <Ref fig="2.5" />
   </p>
 
   <div class="layout">
@@ -113,8 +112,8 @@
           <label class="control"><span>{kind === 'ramp' ? 't_f' : 't₁ (pulse width)'} <b>{t1.toFixed(1)} s</b></span><input type="range" min="0.1" max="2.5" step="0.1" bind:value={t1} /></label>
         {/if}
         {#if kind === 'random'}
-          <button onclick={() => seed++}>New random record</button>
-          <span class="small secondary">Each record is different. You can only predict its <i>statistics</i> (mean, RMS, spectrum).</span>
+          <button onclick={() => seed++}>New record</button>
+          <span class="small secondary">Each record is different; only its <i>statistics</i> (mean, RMS, spectrum) are predictable.</span>
         {/if}
       </div>
     </div>
@@ -138,7 +137,7 @@
     </div>
     {#if guess !== null}
       <p class="small" role="status">
-        {guess === mystery.kind ? '✓' : '✗'} It's <b>{KINDS.find((k) => k.k === mystery.kind)!.name.toLowerCase()}</b>: {mystery.label}. Score {score}/{round + 1}.
+        {guess === mystery.kind ? '✓' : '✗'} Answer: <b>{KINDS.find((k) => k.k === mystery.kind)!.name.toLowerCase()}</b>: {mystery.label}. Score {score}/{round + 1}.
         <button onclick={() => { round++; guess = null; }}>Next →</button>
       </p>
     {/if}
