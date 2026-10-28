@@ -64,3 +64,6 @@ export function addClip(c: Clip) {
   if (i >= 0) clips[i] = c;
   else clips.push(c);
 }
+
+/** Ask a lab elsewhere on the page to switch to a clip (e.g. "send this recording to the filter lab"). */
+export const request = $state({ filter: '', alias: '' });

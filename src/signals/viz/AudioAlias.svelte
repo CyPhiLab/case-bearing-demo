@@ -2,7 +2,7 @@
   // Hear aliasing: resample a sweep (or your own recording) at a lower rate, with and without an anti-aliasing filter.
   import Seg from '../../lib/ui/Seg.svelte';
   import Spectrogram from './Spectrogram.svelte';
-  import { clips } from '../lib/clips.svelte';
+  import { clips, request } from '../lib/clips.svelte';
   import { downsample, stft } from '../../lib/dsp/signals';
   import { play, stop } from '../../lib/audio';
   import { app } from '../../lib/state.svelte';
@@ -10,6 +10,12 @@
   const options = $derived(clips.filter((c) => c.fs >= 8000));
   let clipId = $state('chirp');
   const clip = $derived(options.find((c) => c.id === clipId) ?? options[0]);
+  $effect(() => {
+    if (request.alias) {
+      clipId = request.alias;
+      request.alias = '';
+    }
+  });
   let factor = $state(4);
   let aa = $state(false);
   const y = $derived(downsample(clip.x, clip.fs, factor, aa));

@@ -2,7 +2,7 @@
   // The filter lab: any clip on the page through a Butterworth, moving-average or exponential filter.
   import LineChart from '../../lib/charts/LineChart.svelte';
   import Seg from '../../lib/ui/Seg.svelte';
-  import { clips } from '../lib/clips.svelte';
+  import { clips, request } from '../lib/clips.svelte';
   import { playClip, stop } from '../lib/listen';
   import { butter, ema, emaResponse, movingAverage, movingAverageResponse, sosfilt, sosfiltfilt, sosResponse, toDb, type FilterType } from '../../lib/dsp/filters';
   import { welch } from '../../lib/dsp/signals';
@@ -11,6 +11,12 @@
   type Family = 'butter' | 'sma' | 'ema';
   let clipId = $state('hum');
   const clip = $derived(clips.find((c) => c.id === clipId) ?? clips[0]);
+  $effect(() => {
+    if (request.filter) {
+      clipId = request.filter;
+      request.filter = '';
+    }
+  });
   let family = $state<Family>('butter');
   let type = $state<FilterType>('lowpass');
   let order = $state(4);
