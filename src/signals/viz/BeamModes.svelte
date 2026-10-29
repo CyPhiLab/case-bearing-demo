@@ -41,7 +41,9 @@
       return v;
     }),
   );
-  const ymax = $derived(Math.max(...Array.from(y, Math.abs)) || 1);
+    // reference: the largest possible response, impact and sensor both at the tip (|φ_n| ≤ 1 everywhere),
+  // so moving the impact or sensor changes the plotted amplitude instead of being normalized away
+  const ymax = $derived(fn.reduce((s, f) => s + 1 / (2 * Math.PI * f), 0));
   const spec = $derived(dftAmplitude(y.map((v) => v / ymax), 1 / fs));
   const fTop = $derived(Math.min(fs / 2, fn[3] * 1.15));
 
@@ -122,17 +124,19 @@
   <div class="grid-2">
     <LineChart
       series={[{ y: y.map((v) => v / ymax), dx: 1 / fs, color: 'var(--accent)', width: 1.2 }]}
-      xDomain={[0, Math.min(N / fs, t0 + 8 / fn[0])]}
+            xDomain={[0, Math.min(N / fs, t0 + 8 / fn[0])]}
+      yDomain={[-1.1, 1.1]}
       height={app.mode === 'lecture' ? 220 : 180}
       xLabel="t (s)"
-      yLabel="response (normalized)"
+      yLabel="response (re tip impact)"
       markers={playT !== null ? [{ x: playT, color: 'var(--cls-2)' }] : []}
       ariaLabel="Beam impact response"
     />
     <LineChart
       series={[{ x: spec.freq, y: spec.amp, color: 'var(--accent)', width: 1.5 }]}
-      xDomain={[0, fTop]}
+            xDomain={[0, fTop]}
       logY
+      yDomain={[1e-6, 1]}
       height={app.mode === 'lecture' ? 220 : 180}
       xLabel="frequency (Hz)"
       yLabel="amplitude"

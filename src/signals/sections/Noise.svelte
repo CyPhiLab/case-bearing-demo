@@ -44,7 +44,8 @@
         { y: measured, dx: 1 / fs, color: 'var(--text-secondary)', width: 1, label: 'measured' },
         { y: clean, dx: 1 / fs, color: 'var(--accent)', width: 2.5, label: 'signal y(t) = 2 + sin 2πt' },
       ]}
-      height={app.mode === 'lecture' ? 300 : 240}
+            height={app.mode === 'lecture' ? 300 : 240}
+      yDomain={[-3, 8]}
       xLabel="time (s)"
       yLabel="y (V)"
       legend
@@ -62,7 +63,8 @@
             { x: specClean.freq, y: specClean.amp, color: 'var(--accent)', width: 1.5, label: 'signal' },
           ]}
           xDomain={[0, 100]}
-          logY={logY}
+                    logY={logY}
+          yDomain={logY ? [1e-5, 2] : [0, 1.1]}
           height={200}
           xLabel="frequency (Hz)"
           yLabel="amplitude (V)"

@@ -46,7 +46,8 @@
       { y: data, dx: 1 / fs, color: 'var(--text-muted)', width: 0.8, label: 'data' },
       { y: curve, dx: T / 800, color: 'var(--cls-2)', width: 2.5, label: `model, K = ${K}` },
     ]}
-    xDomain={[0, T]}
+        xDomain={[0, T]}
+    yDomain={[-1.5, 3.5]}
     height={app.mode === 'lecture' ? 280 : 220}
     xLabel="t (s)"
     yLabel="pressure (kPa)"

@@ -52,7 +52,14 @@
     return out;
   }
 
-  const input = $derived(noisy(rec.signal, start, noise, start + app.rec * 7919));
+    const input = $derived(noisy(rec.signal, start, noise, start + app.rec * 7919));
+  // y-axis set by the clean window, so added noise appears larger instead of the axis rescaling
+  const inputRange = $derived.by((): [number, number] => {
+    let m = 0;
+    for (let i = start; i < start + ds.frame; i++) m = Math.max(m, Math.abs(rec.signal[i]));
+    const r = Math.max(0.5, 1.15 * m);
+    return [-r, r];
+  });
   const out = $derived<CNNOutput | null>(cnn ? cnn.run(input) : null);
   const pred = $derived(out ? out.probs.indexOf(Math.max(...out.probs)) : -1);
 
@@ -166,7 +173,8 @@
         <div>
           <h4>Input: 2048 raw samples <span class="muted small">(from the held-out test part of {rec.label})</span></h4>
           <LineChart
-            series={[{ y: input, dx: 1000 / ds.fs, color: classVar(rec.clsIndex), width: 1 }]}
+                        series={[{ y: input, dx: 1000 / ds.fs, color: classVar(rec.clsIndex), width: 1 }]}
+            yDomain={inputRange}
             height={150}
             xLabel="time (ms)"
             yLabel="g"
