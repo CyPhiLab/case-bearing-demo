@@ -38,7 +38,18 @@
     const n = e.freq.findIndex((f) => f > 420);
     return { x: e.freq.subarray(1, n), y: e.amp.subarray(1, n) };
   };
-  const target = $derived(location === 'Outer Race' ? { f: ff.bpfo, name: 'BPFO' } : { f: ff.bpfi, name: 'BPFI' });
+    const target = $derived(location === 'Outer Race' ? { f: ff.bpfo, name: 'BPFO' } : { f: ff.bpfi, name: 'BPFI' });
+  // one shared y-axis for both panels, so machined and real damage can be compared in amplitude
+  const envs = $derived(Object.fromEntries(groups.map((g) => [g.damage, env(chosen(g.damage).r.signal)])));
+  const waveRange = $derived.by((): [number, number] => {
+    let m = 0;
+    for (const g of groups) {
+      const s = chosen(g.damage).r.signal;
+      for (let i = 0; i < Math.min(s.length, Math.round(0.1 * ds!.fs)); i++) m = Math.max(m, Math.abs(s[i]));
+    }
+    return [-1.05 * m, 1.05 * m];
+  });
+  const envMax = $derived(Math.max(...Object.values(envs).map((e) => Math.max(...e.y))) * 1.08);
 
   function listen(id: string, sig: Float64Array, rms: number) {
     if (playingId === id) {
@@ -83,15 +94,17 @@
         </div>
         <LineChart
           series={[{ y: c.r.signal, dx: 1000 / ds.fs, color: classVar(c.r.clsIndex), width: 1 }]}
-          xDomain={[0, 100]}
+                    xDomain={[0, 100]}
+          yDomain={waveRange}
           height={app.mode === 'lecture' ? 170 : 140}
           xLabel="time (ms)"
           hover={false}
           ariaLabel="{c.r.id} waveform"
         />
         <LineChart
-          series={[{ ...env(c.r.signal), color: classVar(c.r.clsIndex), width: 1.3 }]}
+                    series={[{ ...envs[g.damage], color: classVar(c.r.clsIndex), width: 1.3 }]}
           xDomain={[0, 420]}
+          yDomain={[0, envMax]}
           height={app.mode === 'lecture' ? 190 : 160}
           xLabel="envelope spectrum (Hz)"
           markers={[

@@ -11,7 +11,7 @@
   const t0 = 0.1;
   let k = $state(4000); // N/m
   let m = $state(0.5); // kg
-  let zeta = $state(0.02);
+    let zeta = $state(0.01);
   const fn = $derived(Math.sqrt(k / m) / (2 * Math.PI));
   const x = $derived(
     t.map((tt) => {
@@ -71,7 +71,8 @@
       </div>
       <LineChart
         series={[{ y: x, dx: 1 / fs, color: 'var(--accent)', width: 1.2 }]}
-        xDomain={[0, Math.min(2, t0 + 12 / fn)]}
+                xDomain={[0, Math.min(2, t0 + 12 / fn)]}
+        yDomain={[-1.1, 1.1]}
         height={app.mode === 'lecture' ? 200 : 160}
         xLabel="t (s)"
         yLabel="x (mm)"
@@ -81,6 +82,7 @@
       <LineChart
         series={[{ x: spec.freq, y: spec.amp, color: 'var(--accent)', width: 1.5, fill: true }]}
         xDomain={[0, Math.min(fs / 2, Math.max(60, 2 * fn))]}
+                yDomain={[0, 1]}
         height={app.mode === 'lecture' ? 200 : 160}
         xLabel="frequency (Hz)"
         yLabel="amplitude"

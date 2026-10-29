@@ -39,6 +39,7 @@
       { y: truth, dx: 1 / fs, color: 'var(--text-secondary)', width: 1.2, dash: [4, 4], label: 'true response' },
       { y: avg, dx: 1 / fs, color: 'var(--accent)', width: 2, label: `average of ${N}` },
     ]}
+        yDomain={[-2.5, 2.5]}
     height={app.mode === 'lecture' ? 300 : 240}
     xLabel="time after trigger (s)"
     yLabel="acceleration (g)"

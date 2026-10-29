@@ -52,7 +52,12 @@
       return 0;
     });
   });
-  const info = $derived(KINDS.find((k) => k.k === kind)!);
+    const info = $derived(KINDS.find((k) => k.k === kind)!);
+  // fixed axes per class (covering the full slider ranges) so the sliders change the waveform, not the scale
+  const Y_RANGE: Record<Kind, [number, number]> = {
+    static: [-2.5, 3.5], step: [-2.5, 3.5], pulse: [-2.5, 3.5],
+    simple: [-4.5, 5.5], complex: [-6, 7], ramp: [-5.5, 8], random: [-6, 7],
+  };
 
   // mystery game
   const MYSTERY: { kind: Kind; make: () => Float64Array; label: string }[] = [
@@ -95,8 +100,9 @@
     <div class="card">
       <div class="formula"><Tex math={info.tex} display /></div>
       <LineChart
-        series={[{ y, xStart: t[0], dx: 1 / fs, color: 'var(--accent)', width: 2 }]}
+                series={[{ y, xStart: t[0], dx: 1 / fs, color: 'var(--accent)', width: 2 }]}
         xDomain={[-0.5, 3]}
+        yDomain={Y_RANGE[kind]}
         height={app.mode === 'lecture' ? 300 : 240}
         xLabel="t (s)"
         yLabel="y(t)"

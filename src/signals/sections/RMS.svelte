@@ -20,7 +20,7 @@
   const shape = (tt: number) => {
     const p = 2 * Math.PI * f * tt;
     if (wave === 'square') return Math.sign(Math.sin(p)) || 1;
-    if (wave === 'spiky') return Math.sin(p) ** 15 * 2.2; // impulsive: same peak range, much lower RMS
+    if (wave === 'spiky') return Math.sin(p) ** 15; // impulsive: same peak as the sine, much lower RMS
     return Math.sin(p);
   };
   const nz = gaussian(2000, 0.25, 11);
@@ -60,8 +60,8 @@
           {/each}
         </div>
       </div>
-      <label class="control"><span>DC offset A₀ <b>{dc.toFixed(2)} V</b></span><input type="range" min="-2" max="3" step="0.05" bind:value={dc} /></label>
-      <label class="control"><span>AC amplitude C <b>{amp.toFixed(2)} V</b></span><input type="range" min="0" max="2" step="0.05" bind:value={amp} /></label>
+      <label class="control"><span>DC offset A₀ <b>{dc.toFixed(2)} V</b></span><input type="range" min="-1.5" max="2.5" step="0.05" bind:value={dc} /></label>
+      <label class="control"><span>AC amplitude C <b>{amp.toFixed(2)} V</b></span><input type="range" min="0" max="1.5" step="0.05" bind:value={amp} /></label>
       <label class="control"><span>Frequency <b>{f.toFixed(2)} Hz</b></span><input type="range" min="0.25" max="3" step="0.05" bind:value={f} /></label>
       <label class="control"><span>Samples N <b>{N}</b> (δt = {(T / N).toFixed(3)} s)</span><input type="range" min="4" max="200" step="1" bind:value={N} /></label>
       <label class="check"><input type="checkbox" bind:checked={noiseOn} /> add noise</label>
@@ -70,7 +70,8 @@
     <div class="cols">
       <LineChart
         series={[{ y: yDense, dx: T / 2000, color: 'var(--axis)', width: 1.5, label: 'y(t)' }]}
-        xDomain={[0, T]}
+                xDomain={[0, T]}
+        yDomain={[-3.5, 4.5]}
         height={app.mode === 'lecture' ? 300 : 250}
         xLabel="t (s)"
         yLabel="y (V)"

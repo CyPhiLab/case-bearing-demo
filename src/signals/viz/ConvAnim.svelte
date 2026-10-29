@@ -119,7 +119,8 @@
     </div>
     <LineChart
       series={[{ x: fgrid, y: H, color: 'var(--cls-2)', width: 2 }]}
-      xDomain={[0, 0.5]}
+            xDomain={[0, 0.5]}
+      yDomain={[0, 2.1]}
       height={140}
       xLabel="frequency (cycles per sample, f/fs)"
       yLabel="|H(f)|"
