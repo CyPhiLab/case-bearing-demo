@@ -6,9 +6,9 @@
   import Seg from '../../lib/ui/Seg.svelte';
   import { dftAmplitude, linspace } from '../../lib/dsp/signals';
   import { app } from '../../lib/state.svelte';
+  import { BL, MATERIALS, beamFreqs, phi } from '../../lib/beam';
 
-  const BL = [1.8751, 4.6941, 7.8548, 10.9955]; // roots of 1 + cos βL cosh βL = 0
-  const MAT = { steel: { E: 200e9, rho: 7850, label: 'Steel' }, aluminum: { E: 69e9, rho: 2700, label: 'Aluminum' } };
+  const MAT = MATERIALS;
   let mat = $state<keyof typeof MAT>('steel');
   let L = $state(0.3); // m
   let h = $state(1); // mm
@@ -16,12 +16,7 @@
   let xm = $state(1); // sensor position, x/L
   const zeta = 0.01;
 
-  const phi = (n: number, u: number) => {
-    const b = BL[n], s = (Math.cosh(b) + Math.cos(b)) / (Math.sinh(b) + Math.sin(b));
-    return (Math.cosh(b * u) - Math.cos(b * u) - s * (Math.sinh(b * u) - Math.sin(b * u))) / 2;
-  };
-  const c = $derived(Math.sqrt((MAT[mat].E * (h / 1000) ** 2) / (12 * MAT[mat].rho)));
-  const fn = $derived(BL.map((b) => (b * b * c) / (2 * Math.PI * L * L)));
+  const fn = $derived(beamFreqs(MAT[mat].E, MAT[mat].rho, h / 1000, L));
 
   const fs = 4096;
   const N = 16384;
