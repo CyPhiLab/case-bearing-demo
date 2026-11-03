@@ -5,7 +5,7 @@
   import Seg from '../../lib/ui/Seg.svelte';
   import LineChart from '../../lib/charts/LineChart.svelte';
   import StemChart from '../viz/StemChart.svelte';
-  import { MotionRecorder, motionSupported, requestMotionPermission, resample, simulateRecord, toCSV, type MotionRecord } from '../lib/motion';
+  import { MotionRecorder, motionHelp, motionSupported, requestMotionPermission, resample, simulateRecord, toCSV, type MotionRecord } from '../lib/motion';
   import { addClip, clips, request } from '../lib/clips.svelte';
   import { mean, rms, welch } from '../../lib/dsp/signals';
   import { app } from '../../lib/state.svelte';
@@ -30,8 +30,10 @@
   async function start() {
     status = '';
     if (!motionSupported()) { status = 'This browser has no motion sensor API. Use a phone, or the simulated recording.'; return; }
-    const ok = await requestMotionPermission();
-    if (!ok) { status = 'Motion access was denied. On iPhone: Settings → Safari → Motion & Orientation Access.'; return; }
+    const perm = await requestMotionPermission();
+    if (perm.state === 'denied') { status = `Motion sensor access is blocked for this site. ${motionHelp()}`; return; }
+    // if the permission request itself failed, listen anyway: some browsers deliver events regardless
+    const note = perm.state === 'error' ? ` (The permission request failed: ${perm.message}.)` : '';
     recorder = new MotionRecorder();
     recorder.start();
     const t0 = performance.now();
@@ -41,7 +43,7 @@
       liveCount = recorder!.count;
       if (elapsed > 1.5 && liveCount === 0) {
         finish();
-        status = 'No motion events were received. The device may have no accelerometer, or the page must be opened over https.';
+        status = `No motion events were received.${note} The device may have no accelerometer, the page must be opened over https, or motion access is blocked. ${motionHelp()}`;
         return;
       }
       if (elapsed >= duration) finish();

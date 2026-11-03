@@ -88,6 +88,50 @@ test('phone lab: records synthetic devicemotion events and measures the sample r
   await expect(page.locator('#phone')).toContainText('peak 4.');
 });
 
+// Chrome 151+ on Android (like Safari on iOS) has DeviceMotionEvent.requestPermission()
+const withPermissionApi = (answer: 'granted' | 'denied' | 'throw') =>
+  `Object.defineProperty(DeviceMotionEvent, 'requestPermission', { configurable: true, value: async () => {
+     if (${JSON.stringify(answer)} === 'throw') throw new DOMException('requires user activation', 'NotAllowedError');
+     return ${JSON.stringify(answer)};
+   } });`;
+
+test('phone lab: a granted permission request (Chrome 151+, Safari) records events', async ({ page }) => {
+  await page.addInitScript(withPermissionApi('granted'));
+  await open(page);
+  await page.locator('#phone button', { hasText: '5 s' }).click();
+  await page.locator('[data-testid=phone-start]').click();
+  await page.evaluate(() => {
+    const t0 = performance.now();
+    const iv = setInterval(() => {
+      if (performance.now() - t0 > 6000) return clearInterval(iv);
+      window.dispatchEvent(new DeviceMotionEvent('devicemotion', { accelerationIncludingGravity: { x: 0, y: 0, z: 9.81 }, interval: 10 }));
+    }, 10);
+  });
+  await expect(page.locator('[data-testid=phone-analysis]')).toBeVisible({ timeout: 15_000 });
+});
+
+test('phone lab: a blocked site shows how to re-enable motion sensors', async ({ page }) => {
+  await page.addInitScript(withPermissionApi('denied'));
+  await open(page);
+  await page.locator('[data-testid=phone-start]').click();
+  await expect(page.locator('#phone [role=alert]')).toContainText('Site settings → Motion sensors');
+});
+
+test('phone lab: a failed permission request still listens for events', async ({ page }) => {
+  await page.addInitScript(withPermissionApi('throw'));
+  await open(page);
+  await page.locator('#phone button', { hasText: '5 s' }).click();
+  await page.locator('[data-testid=phone-start]').click();
+  await page.evaluate(() => {
+    const t0 = performance.now();
+    const iv = setInterval(() => {
+      if (performance.now() - t0 > 6000) return clearInterval(iv);
+      window.dispatchEvent(new DeviceMotionEvent('devicemotion', { accelerationIncludingGravity: { x: 0, y: 0, z: 9.81 }, interval: 10 }));
+    }, 10);
+  });
+  await expect(page.locator('[data-testid=phone-analysis]')).toBeVisible({ timeout: 15_000 });
+});
+
 test('phone lab: the simulated fan shows the 60 Hz tone aliased to 40 Hz', async ({ page }) => {
   await open(page);
   await page.locator('[data-testid=phone-sim]').click();
