@@ -51,32 +51,6 @@ as a supplement through small "F&B Eq./Fig./Example" tags.
 The filters are a SciPy-compatible Butterworth implementation (`butter(..., output='sos')`, `sosfilt`, `sosfiltfilt`), checked
 against SciPy to 6–7 decimal places in `tests/filters.test.ts`. Microphone and motion data are processed only in the browser.
 
-## Third page: Sensors Lab (`/sensors/`)
-
-A standalone page for the **Types of Sensors** lecture at `https://<owner>.github.io/case-bearing-demo/sensors/`. It follows the
-slide order. Each sensor has a short description, a spec card with typical values, one or two interactive figures (how it works,
-and what most often goes wrong), and links to the videos shown in the lecture.
-
-| # | Sensor | Students can… | Slide |
-|---|--------|---------------|-------|
-| 1 | Strain gauge | Load a cantilever and read the gauge strain and ΔR; build quarter, dummy, half and full **Wheatstone bridges** and see temperature drift and axial strain cancel; choose amplifier gain and ADC bits; simulate poor adhesion | 2–4 |
-| 2 | Accelerometer | Explore the seismic mass–spring–damper response (accelerometer vs seismometer region, ζ ≈ 0.7); move a MEMS comb; see **mass loading** lower a cantilever's natural frequencies | 5–7 |
-| 3 | Gyroscope | Watch the Coriolis force on a vibrating proof mass; integrate a biased, noisy rate and watch the angle drift | 8 |
-| 4 | Hall effect | Compare the Hall voltage in copper and silicon; turn a toothed wheel (ABS, 36 − 1 crank wheel) into pulses and speed | 9 |
-| 5 | Magnetometer | Compute heading; add hard- and soft-iron errors, rotate, and **calibrate**; tow a magnetometer over buried iron (1/r³) | 10 |
-| 6 | IMU | Fuse gyro and accelerometer tilt with a **complementary filter**; see dead-reckoning error grow as ½bt² | 11 |
-| 7 | Time of flight / lidar | Pulsed and phase-shift ToF (67 ps per cm, ambiguity range c/2f); a 2D **lidar** in a room with draggable objects, dropouts and shadowing | 12 |
-| 8 | Laser Doppler vibrometer | Doppler shift and fringes (why a Bragg cell is needed); **scan** a cantilever to recover its mode shapes without mass loading | 13 |
-| 9 | Pitot tube | Read a U-tube manometer at different speeds and altitudes; see why low speeds have large uncertainty | 14 |
-| 10 | Thermocouple | NIST type K curve, **cold-junction compensation**, Seebeck nonlinearity; plunge test with bead size and medium | 15 |
-| 11 | Thermistor | NTC vs Pt100 sensitivity and range; choose a divider resistor for linearity; self-heating | 16 |
-| 12 | Soft sensors | Stretchable resistive (R₀λ²) and capacitive (C₀λ) sensors with hysteresis and drift; a GelSight-style photometric-stereo touch sensor | 17 |
-| 13 | Fiber Bragg grating | Four gratings on one fiber, strain along a beam, and temperature compensation with a loose reference grating | 18 |
-| 14 | Phone sensor lab | Record a phone's accelerometer, gyroscope and compass; compare accelerometer tilt, integrated gyro and fusion; watch a magnet swing the heading; CSV download. Desktop gets a QR code and a simulated recording | – |
-
-The physics models are in `src/sensors/lib/physics.ts` and are checked in `tests/sensors.test.ts` against reference values (NIST
-ITS-90 type K table, IEC 60751 Pt100, standard atmosphere, bridge and seismic-instrument limits, Bragg sensitivity).
-
 ## Data and methodology notes (for the instructor)
 
 The data comes from [srigas/CWRU_Bearing_NumPy](https://github.com/srigas/CWRU_Bearing_NumPy), a NumPy copy of the CWRU Bearing Data
@@ -120,7 +94,7 @@ In the stress test, data is split by **whole bearings**, so the test bearings ar
 
 ```bash
 npm ci
-npm run dev          # http://localhost:5173/case-bearing-demo/  (Signals Lab: /signals/, Sensors Lab: /sensors/)
+npm run dev          # http://localhost:5173/case-bearing-demo/  (Signals Lab: /case-bearing-demo/signals/)
 npm test             # unit tests: FFT, features vs Python, PCA vs sklearn, MLP gradients, CNN vs PyTorch, filters vs SciPy
 npm run check        # type-check
 npm run build        # static site in dist/
@@ -168,9 +142,6 @@ src/lib/charts/      canvas/SVG chart components
 src/sections/        one Svelte component per page section (bearing case study)
 signals/index.html   entry point of the standalone Signals Lab page
 src/signals/         Signals Lab: sections/, viz/ (interactive figures), lib/ (clips, mic, motion)
-sensors/index.html   entry point of the standalone Sensors Lab page
-src/sensors/         Sensors Lab: sections/, viz/, ui/ (spec cards, video links), lib/ (physics models, registry, phone IMU capture)
-src/lib/beam.ts      cantilever modes shared by the Signals and Sensors labs
 src/lib/dsp/         also filters.ts (Butterworth, moving averages) and signals.ts (generators, DFT, STFT, Welch, …)
 tests/               vitest unit tests + Playwright smoke tests
 ```
