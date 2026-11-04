@@ -31,11 +31,13 @@ async function feed(page: Page, seconds: number) {
             new DeviceMotionEvent('devicemotion', {
               accelerationIncludingGravity: { x: 0, y: g * Math.sin(beta * D), z: g * Math.cos(beta * D) },
               acceleration: { x: 0, y: 0, z: 0 },
-              rotationRate: { alpha: 0, beta: rate + 1, gamma: 0 },
+              rotationRate: { alpha: rate + 1, beta: 0, gamma: 0 }, // spec order: alpha = x
               interval: 10,
             }),
           );
           window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute', { alpha: 40, beta, gamma: 0, absolute: true }));
+          // Chrome also sends a relative stream with an arbitrary heading; it must not replace the absolute one
+          window.dispatchEvent(new DeviceOrientationEvent('deviceorientation', { alpha: 250, beta, gamma: 0, absolute: false }));
         }, 10);
       }),
     seconds,
@@ -79,6 +81,40 @@ test('fusion page: synthetic phone sensors drive the live tilt, the Kalman bias 
   expect(await diff(0)).toBeGreaterThan(5);
   await expect(page.locator('[data-testid=phone-madc] polygon').first()).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test('fusion page: a browser using the older gyro axis order is detected and corrected', async ({ page }) => {
+  await open(page);
+  await page.locator('#orientation [data-testid=live-start]').click();
+  // tilt back and forth about x (±40° at 0.5 Hz), reporting the x rate in rotationRate.beta (older order)
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const D = Math.PI / 180, g = 9.81;
+        const t0 = performance.now();
+        const iv = setInterval(() => {
+          const t = (performance.now() - t0) / 1000;
+          if (t > 8) {
+            clearInterval(iv);
+            resolve();
+            return;
+          }
+          const beta = 40 * Math.sin(Math.PI * t);
+          const rate = 40 * Math.PI * Math.cos(Math.PI * t);
+          window.dispatchEvent(
+            new DeviceMotionEvent('devicemotion', {
+              accelerationIncludingGravity: { x: 0, y: g * Math.sin(beta * D), z: g * Math.cos(beta * D) },
+              rotationRate: { alpha: 0, beta: rate, gamma: 0 },
+              interval: 10,
+            }),
+          );
+          window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute', { alpha: 40, beta, gamma: 0, absolute: true }));
+        }, 10);
+      }),
+  );
+  await expect(page.locator('#sensors')).toContainText('older axis order');
+  const rows = page.locator('#orientation tbody tr');
+  expect(parseFloat((await rows.nth(0).locator('td').last().textContent())!)).toBeLessThan(5); // gyro only now tracks
 });
 
 test('fusion page: a blocked site shows how to re-enable motion sensors', async ({ page }) => {
