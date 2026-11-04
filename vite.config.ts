@@ -9,8 +9,12 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
-      // two independent pages: the bearing case study and the Signals & Data lab
-      input: { main: resolve(__dirname, 'index.html'), signals: resolve(__dirname, 'signals/index.html') },
+      // independent pages: the bearing case study, the Signals & Data lab and the sensor-fusion lab
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        signals: resolve(__dirname, 'signals/index.html'),
+        fusion: resolve(__dirname, 'fusion/index.html'),
+      },
     },
   },
   test: { include: ['tests/**/*.test.ts'] },
