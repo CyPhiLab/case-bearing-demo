@@ -86,6 +86,7 @@
       Lying still, the accelerometer reads about 9.8 m/s² on z and the gyroscope reads close to zero. Turn the phone and watch the gyroscope; tilt
       it and the gravity reading moves between the axes.
       {#if live.running && !live.hasHeading}This browser does not report a compass heading.{/if}
+      {#if live.axesDecided && live.axes === 'legacy'}This browser reports the rotation rates in an older axis order (beta, gamma, alpha for x, y, z); the page detected this from your tilting and corrected it.{/if}
       {#if live.flipped}This browser reports accelerations with the opposite sign to the specification, so the page has flipped them.{/if}
     </p>
   </div>

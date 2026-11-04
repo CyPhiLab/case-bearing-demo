@@ -4,7 +4,9 @@
 
 import { motionHelp, motionSupported, requestMotionPermission } from '../../signals/lib/motion';
 import {
+  AxisCheck,
   DEG,
+  gyroAxes,
   TiltKalman,
   complementaryStep,
   madgwickStep,
@@ -28,6 +30,8 @@ export const live = $state({
   hasHeading: false,
   hasLinear: false,
   flipped: false,
+  axes: 'spec' as 'spec' | 'legacy',
+  axesDecided: false,
 });
 
 /** filter settings, changed by the sliders on the page */
@@ -76,6 +80,8 @@ let accelSign = 1;
 let thGyro = 0, thComp = 0, vel = 0, pos = 0;
 let initialized = false;
 let headingAligned = false;
+let axisCheck = new AxisCheck();
+let sawHeading = false; // once a compass-referenced event has arrived, ignore relative ones
 let timer: ReturnType<typeof setInterval> | null = null;
 let started = 0;
 
@@ -129,8 +135,19 @@ function onMotion(e: DeviceMotionEvent) {
   const r = e.rotationRate;
   const hasGyro = !!r && r.beta !== null;
   if (hasGyro) live.hasGyro = true;
-  // rotationRate: beta about x, gamma about y, alpha about z (°/s)
-  const wDeg: Vec3 = hasGyro ? [r!.beta ?? 0, r!.gamma ?? 0, r!.alpha ?? 0] : [0, 0, 0];
+  // rotationRate (°/s): the spec maps alpha, beta, gamma to the device x, y, z axes; some browsers used another
+  // order, so the first seconds of tilting are used to check which one matches the accelerometer
+  const raw = { alpha: r?.alpha ?? 0, beta: r?.beta ?? 0, gamma: r?.gamma ?? 0 };
+  if (hasGyro && !axisCheck.decided) {
+    axisCheck.add(a, raw, dt);
+    if (axisCheck.decided) {
+      live.axes = axisCheck.convention;
+      live.axesDecided = true;
+      // restart the estimates if they were run with the wrong axes
+      if (axisCheck.convention !== 'spec') initFrom(a);
+    }
+  }
+  const wDeg: Vec3 = hasGyro ? gyroAxes(raw, live.axes) : [0, 0, 0];
   const w: Vec3 = [wDeg[0] * DEG, wDeg[1] * DEG, wDeg[2] * DEG];
   cur.a = a;
   cur.w = wDeg;
@@ -202,6 +219,9 @@ function onOrient(ev: Event) {
       headingAligned = true;
     }
   }
+  // Chrome on Android sends both an absolute (compass-referenced) and a relative orientation stream
+  if (!Number.isNaN(alpha)) sawHeading = true;
+  else if (sawHeading) return;
   if (e.beta !== null && e.gamma !== null) {
     const a = Number.isNaN(alpha) ? (e.alpha ?? 0) : alpha;
     cur.browser = { alpha: a, beta: e.beta, gamma: e.gamma };
@@ -237,6 +257,10 @@ export async function startSensors() {
   if (perm.state === 'error') live.note = ` (The permission request failed: ${perm.message}.)`;
   clearBuffers();
   initialized = false;
+  axisCheck = new AxisCheck();
+  sawHeading = false;
+  live.axes = 'spec';
+  live.axesDecided = false;
   headingAligned = false;
   cur.heading = NaN;
   accelSign = 1;

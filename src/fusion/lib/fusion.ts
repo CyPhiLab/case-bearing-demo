@@ -237,3 +237,50 @@ export function qAngleBetween(a: Quat, b: Quat): number {
 
 /** position error from a constant accelerometer bias b after t seconds, ½ b t² */
 export const deadReckonError = (b: number, t: number) => 0.5 * b * t * t;
+
+// ───────────────────────── gyro axis convention ─────────────────────────
+
+/**
+ * Browsers disagree on how DeviceMotionEvent.rotationRate maps to the device axes. The current spec uses
+ * alpha → x, beta → y, gamma → z; older documents used beta → x, gamma → y, alpha → z. This check compares the tilt
+ * rate seen by the accelerometer with each candidate x-axis rate and picks the one that agrees.
+ */
+export type AxisConvention = 'spec' | 'legacy';
+export const gyroAxes = (r: { alpha: number; beta: number; gamma: number }, c: AxisConvention): Vec3 =>
+  c === 'spec' ? [r.alpha, r.beta, r.gamma] : [r.beta, r.gamma, r.alpha];
+
+export class AxisCheck {
+  convention: AxisConvention = 'spec';
+  decided = false;
+  private sxy = { spec: 0, legacy: 0 };
+  private sxx = { spec: 0, legacy: 0 };
+  private syy = 0;
+  private prev = NaN;
+  /** a: accelerometer including gravity, r: raw rotationRate (°/s), dt: s */
+  add(a: Vec3, r: { alpha: number; beta: number; gamma: number }, dt: number) {
+    if (this.decided) return;
+    const g = Math.hypot(...a);
+    // tilt about x from gravity, only while the phone is not accelerating much and is not lying on its side
+    const th = Math.atan2(a[1], a[2]) / DEG;
+    const ok = Math.abs(g - G) < 1.5 && Math.abs(a[0]) < 0.5 * g;
+    if (ok && !Number.isNaN(this.prev) && dt > 0) {
+      const d = wrap180(th - this.prev) / dt;
+      if (Math.abs(d) < 400) {
+        this.syy += d * d;
+        for (const c of ['spec', 'legacy'] as const) {
+          const x = gyroAxes(r, c)[0];
+          this.sxy[c] += x * d;
+          this.sxx[c] += x * x;
+        }
+      }
+    }
+    this.prev = ok ? th : NaN;
+    // decide once there has been a clear tilt motion (≈ a few seconds of tilting back and forth)
+    if (this.syy > 2e6) {
+      const corr = (c: AxisConvention) => this.sxy[c] / Math.sqrt(this.sxx[c] * this.syy || 1);
+      const s = corr('spec'), l = corr('legacy');
+      this.convention = l > s + 0.3 && l > 0.5 ? 'legacy' : 'spec';
+      this.decided = true;
+    }
+  }
+}

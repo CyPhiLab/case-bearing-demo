@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AxisCheck,
   DEG,
   G,
+  gyroAxes,
   TiltKalman,
   complementaryFilter,
   complementaryResponse,
@@ -109,5 +111,31 @@ describe('Madgwick filter and compass correction', () => {
     expect(e.alpha).toBeCloseTo(100, 1);
     expect(e.beta).toBeCloseTo(20, 6);
     expect(e.gamma).toBeCloseTo(5, 6);
+  });
+});
+
+describe('gyro axis convention check', () => {
+  // tilting back and forth about x at 0.5 Hz, ±40°
+  const run = (report: (wx: number) => { alpha: number; beta: number; gamma: number }) => {
+    const c = new AxisCheck();
+    for (let i = 0; i < 3000 && !c.decided; i++) {
+      const t = i / 100;
+      const th = 40 * Math.sin(Math.PI * t);
+      const w = 40 * Math.PI * Math.cos(Math.PI * t);
+      c.add([0, G * Math.sin(th * DEG), G * Math.cos(th * DEG)], report(w), 0.01);
+    }
+    return c;
+  };
+  it('recognizes the spec order (alpha = x)', () => {
+    const c = run((wx) => ({ alpha: wx, beta: 0, gamma: 0 }));
+    expect(c.decided).toBe(true);
+    expect(c.convention).toBe('spec');
+    expect(gyroAxes({ alpha: 1, beta: 2, gamma: 3 }, 'spec')).toEqual([1, 2, 3]);
+  });
+  it('recognizes the older order (beta = x)', () => {
+    const c = run((wx) => ({ alpha: 0, beta: wx, gamma: 0 }));
+    expect(c.decided).toBe(true);
+    expect(c.convention).toBe('legacy');
+    expect(gyroAxes({ alpha: 1, beta: 2, gamma: 3 }, 'legacy')).toEqual([2, 3, 1]);
   });
 });
