@@ -51,6 +51,25 @@ as a supplement through small "F&B Eq./Fig./Example" tags.
 The filters are a SciPy-compatible Butterworth implementation (`butter(..., output='sos')`, `sosfilt`, `sosfiltfilt`), checked
 against SciPy to 6–7 decimal places in `tests/filters.test.ts`. Microphone and motion data are processed only in the browser.
 
+## Third page: Sensor Fusion Lab (`/fusion/`)
+
+A standalone page at `https://<owner>.github.io/case-bearing-demo/fusion/` that builds up sensor fusion with the sensors in a phone.
+Each section has a figure with simulated data and a live figure; one **Start phone sensors** button feeds every live figure on the
+page. On a laptop, a QR code opens the page on a phone.
+
+| # | Section | Students can… |
+|---|---------|---------------|
+| 1 | The sensors in a phone | See what the accelerometer, gyroscope and magnetometer each give and get wrong; watch all three live |
+| 2 | Tilt from the accelerometer | See how horizontal acceleration fakes a tilt (atan(a/g)); a live bubble level and tilt trace |
+| 3 | Angle from the gyroscope | Integrate a biased, noisy rate and watch the angle drift; compare live integrated gyro and accelerometer tilt |
+| 4 | Complementary filter | See the low-pass/high-pass pair and its crossover frequency; tune α on simulated data and live |
+| 5 | Kalman filter | Inverse-variance weighting, predict/update, gain and **gyro-bias estimation**; mis-tune R and Q on purpose; live estimate and bias |
+| 6 | 3D orientation | Euler angles vs quaternions (gimbal lock); live 3D phones for gyro only, **Madgwick** (accelerometer + gyro), Madgwick + compass, and the phone's own estimate |
+| 7 | Dead reckoning | Why double integration fails (½bt²); live position from the phone's acceleration |
+
+Browsers do not expose raw magnetometer readings, so the page uses the compass heading from orientation events as its magnetometer
+measurement. The filters are in `src/fusion/lib/fusion.ts` and tested in `tests/fusion.test.ts`.
+
 ## Data and methodology notes (for the instructor)
 
 The data comes from [srigas/CWRU_Bearing_NumPy](https://github.com/srigas/CWRU_Bearing_NumPy), a NumPy copy of the CWRU Bearing Data
@@ -94,7 +113,7 @@ In the stress test, data is split by **whole bearings**, so the test bearings ar
 
 ```bash
 npm ci
-npm run dev          # http://localhost:5173/case-bearing-demo/  (Signals Lab: /case-bearing-demo/signals/)
+npm run dev          # http://localhost:5173/case-bearing-demo/  (Signals Lab: /signals/, Sensor Fusion Lab: /fusion/)
 npm test             # unit tests: FFT, features vs Python, PCA vs sklearn, MLP gradients, CNN vs PyTorch, filters vs SciPy
 npm run check        # type-check
 npm run build        # static site in dist/
@@ -142,6 +161,8 @@ src/lib/charts/      canvas/SVG chart components
 src/sections/        one Svelte component per page section (bearing case study)
 signals/index.html   entry point of the standalone Signals Lab page
 src/signals/         Signals Lab: sections/, viz/ (interactive figures), lib/ (clips, mic, motion)
+fusion/index.html    entry point of the standalone Sensor Fusion Lab page
+src/fusion/          Sensor Fusion Lab: sections/, viz/, ui/ (live start, live charts, 3D phone), lib/ (filters, live sensor stream)
 src/lib/dsp/         also filters.ts (Butterworth, moving averages) and signals.ts (generators, DFT, STFT, Welch, …)
 tests/               vitest unit tests + Playwright smoke tests
 ```
